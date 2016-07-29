@@ -10,10 +10,10 @@ import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 
-import model.fetcher.WikiFetcher;
-import model.index.Index;
-import model.index.TermCounter;
-import model.index.WikiIndex;
+import fetcher.WikiFetcher;
+import index.Index;
+import index.TermCounter;
+import index.WikiIndex;
 
 public class IndexTest {
 

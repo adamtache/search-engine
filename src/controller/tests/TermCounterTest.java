@@ -10,8 +10,8 @@ import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 
-import model.fetcher.WikiFetcher;
-import model.index.TermCounter;
+import fetcher.WikiFetcher;
+import index.TermCounter;
 
 /**
  * @author downey

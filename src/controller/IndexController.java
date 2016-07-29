@@ -3,25 +3,43 @@ package controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import org.jsoup.select.Elements;
-import model.fetcher.Fetcher;
-import model.index.Index;
-import model.index.TermCounter;
+
+import fetcher.Fetcher;
+import index.Document;
+import index.Index;
+import index.TermCounter;
 
 public class IndexController {
 
 	private Index indexer;
 	private Fetcher fetcher;
+	private List<Document> documents;
 
 	public IndexController(Index index){
 		this.indexer = index;
 		this.fetcher = index.getFetcher();
+		this.documents = new ArrayList<>();
 	}
 
 	public void indexUrls(List<String> urls) throws IOException{
 		for(String url : urls){
 			Elements paragraphs = fetcher.fetch("https://en.wikipedia.org" + url);
 			indexer.indexPage(url, paragraphs);
+			documents.add(new Document(url));
+		}
+	}
+
+	public void calculateTfidf(){
+		Set<String> terms = indexer.keySet();
+		for(String term : terms){
+			for(TermCounter tc : indexer.get(term)){
+				String url = tc.getLabel();
+				double tfidf = normalizedTfIdf(term, url);
+				getDocument(url).add(term, tfidf);
+			}
 		}
 	}
 
@@ -41,7 +59,7 @@ public class IndexController {
 		}
 		return 0;
 	}
-	
+
 	public double idf(String term){
 		int numDocuments = indexer.getIndexed().size();
 		int documentFrequency = 0;
@@ -76,6 +94,19 @@ public class IndexController {
 			}
 		}
 		return documentVector;
+	}
+	
+	private Document getDocument(String url){
+		for(Document doc : documents){
+			if(doc.getUrl().equals(url)){
+				return doc;
+			}
+		}
+		return null;
+	}
+
+	public List<Document> getDocuments() {
+		return documents;
 	}
 
 }

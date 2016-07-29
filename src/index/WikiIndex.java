@@ -1,7 +1,7 @@
-package model.index;
+package index;
 
-import model.fetcher.Fetcher;
-import model.fetcher.WikiFetcher;
+import fetcher.Fetcher;
+import fetcher.WikiFetcher;
 
 public class WikiIndex extends Index{
 

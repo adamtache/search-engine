@@ -1,11 +1,14 @@
-package model.index;
+package index;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+
 import org.jsoup.select.Elements;
-import model.fetcher.Fetcher;
+
+import fetcher.Fetcher;
 
 /**
  * Encapsulates a map from search term to set of TermCounter.

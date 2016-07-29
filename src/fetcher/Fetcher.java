@@ -1,4 +1,4 @@
-package model.fetcher;
+package fetcher;
 
 import java.io.IOException;
 

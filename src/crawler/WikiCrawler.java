@@ -1,4 +1,4 @@
-package model.crawler;
+package crawler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +10,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import model.WikiNodeIterable;
-import model.fetcher.WikiFetcher;
+import fetcher.WikiFetcher;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -37,7 +36,7 @@ public class WikiCrawler extends Crawler{
 			System.out.println("Visited " + url);
 			Elements paras = wf.fetch("https://en.wikipedia.org" + url);
 			for(Element para : paras){ // Loop through paragraphs until one found with valid link
-				Iterable<Node> iter = new WikiNodeIterable(para);
+				Iterable<Node> iter = new NodeIterable(para);
 				for (Node node: iter) {
 					int parenCount = 0;
 					if (node instanceof TextNode) {

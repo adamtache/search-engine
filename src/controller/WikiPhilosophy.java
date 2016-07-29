@@ -3,7 +3,7 @@ package controller;
 import java.io.IOException;
 import java.util.List;
 
-import model.crawler.WikiCrawler;
+import crawler.WikiCrawler;
 
 /**
  * Contains main for crawling Wikipedia. Allows you to crawl from any wiki page X to page Y.

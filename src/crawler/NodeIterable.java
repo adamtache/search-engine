@@ -1,7 +1,7 @@
 /**
  * 
  */
-package model;
+package crawler;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import org.jsoup.nodes.Node;
  * @author downey
  *
  */
-public class WikiNodeIterable implements Iterable<Node> {
+public class NodeIterable implements Iterable<Node> {
 
 	private Node root;
 
@@ -29,7 +29,7 @@ public class WikiNodeIterable implements Iterable<Node> {
 	 * 
 	 * @param root
 	 */
-	public WikiNodeIterable(Node root) {
+	public NodeIterable(Node root) {
 	    this.root = root;
 	}
 

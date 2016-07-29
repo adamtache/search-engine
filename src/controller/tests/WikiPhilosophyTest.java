@@ -1,13 +1,15 @@
 /**
  * 
  */
-package controller;
+package controller.tests;
 
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 
 import org.junit.Test;
+
+import controller.WikiPhilosophy;
 
 /**
  * @author downey

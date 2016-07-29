@@ -1,4 +1,4 @@
-package model;
+package controller.tests;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -10,6 +10,11 @@ import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 
+import model.fetcher.WikiFetcher;
+import model.index.Index;
+import model.index.TermCounter;
+import model.index.WikiIndex;
+
 public class IndexTest {
 
 	private Index index;
@@ -18,18 +23,38 @@ public class IndexTest {
 	@Before
 	public void setUp() {
 		wf = new WikiFetcher();
-		index = new Index();
+		index = new WikiIndex();
+	}
+	
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		
+		WikiFetcher wf = new WikiFetcher();
+		Index indexer = new WikiIndex();
+
+		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
+		Elements paragraphs = wf.fetch(url);
+		indexer.indexPage(url, paragraphs);
+		
+		url = "https://en.wikipedia.org/wiki/Programming_language";
+		paragraphs = wf.fetch(url);
+		indexer.indexPage(url, paragraphs);
+		
+		indexer.printIndex();
 	}
 
 	@Test
 	public void testIndexPage() throws IOException {
 		// add two pages to the index
 		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		Elements paragraphs = wf.readWikipedia(url);
+		Elements paragraphs = wf.read(url);
 		index.indexPage(url, paragraphs);
 		
 		url = "https://en.wikipedia.org/wiki/Programming_language";
-		paragraphs = wf.readWikipedia(url);
+		paragraphs = wf.read(url);
 		index.indexPage(url, paragraphs);
 		
 		// check the results: the word "occur" only appears on one page, twice

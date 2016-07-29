@@ -1,7 +1,7 @@
 /**
  * 
  */
-package controller;
+package controller.tests;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -10,8 +10,8 @@ import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 
-import model.TermCounter;
-import model.WikiFetcher;
+import model.fetcher.WikiFetcher;
+import model.index.TermCounter;
 
 /**
  * @author downey
@@ -29,7 +29,7 @@ public class TermCounterTest {
 		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
 		
 		WikiFetcher wf = new WikiFetcher();
-		Elements paragraphs = wf.readWikipedia(url);
+		Elements paragraphs = wf.read(url);
 		
 		counter = new TermCounter(url.toString());
 		counter.processElements(paragraphs);

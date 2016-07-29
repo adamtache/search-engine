@@ -3,11 +3,16 @@ package controller;
 import java.io.IOException;
 import java.util.List;
 
-import model.WikiCrawler;
+import model.crawler.WikiCrawler;
+
+/**
+ * Contains main for crawling Wikipedia. Allows you to crawl from any wiki page X to page Y.
+ * 
+ * @author downey
+ *
+ */
 
 public class WikiPhilosophy {
-	
-	
 	
 	/**
 	 * Tests a conjecture about Wikipedia and Philosophy.

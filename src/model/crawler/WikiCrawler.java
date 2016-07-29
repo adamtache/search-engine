@@ -66,7 +66,7 @@ public class WikiCrawler extends Crawler{
 								}
 							}
 							String linkText = link.text();
-							if(Character.isUpperCase(linkText.charAt(0))){ // Link not valid if capitalized text
+							if(linkText.length() > 0 && Character.isUpperCase(linkText.charAt(0))){ // Link not valid if capitalized text
 								continue;
 							}
 							String next = link.attr("href");
@@ -171,16 +171,6 @@ public class WikiCrawler extends Crawler{
 		return url.substring(url.indexOf("/wiki/"));
 	}
 	
-	private String getJavaStart(){
-		String url = getJavaURL();
-		return getValidURL(url);
-	}
-	
-	private String getPhilosophyGoal(){
-		String url = this.getPhilosophyURL();
-		return getValidURL(url);
-	}
-	
 	/**
 	 * Gets philosophy Wikipedia page URL.
 	 * 
@@ -206,10 +196,6 @@ public class WikiCrawler extends Crawler{
 	 */
 	private String getJavaURL(){
 		return "https://en.wikipedia.org/wiki/Java_(programming_language)";
-	}
-	
-	private String getValidURL(String url){
-		return url.substring(url.indexOf("/wiki/"));
 	}
 
 }

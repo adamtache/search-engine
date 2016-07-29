@@ -1,24 +1,32 @@
 package controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import model.crawler.WikiCrawler;
 import model.index.Index;
 import model.index.WikiIndex;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException{
-		Index indexer = new WikiIndex();
-		IndexController id = new IndexController(indexer);
-		String url1 = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		String url2 = "https://en.wikipedia.org/wiki/Programming_language";
-		List<String> urls = new ArrayList<>();
-		urls.add(url1); urls.add(url2);
-		id.indexUrls(urls);
-		indexer.printIndex();
-		System.out.println("TFIDF: " + id.tfIdf("wora"));
+		printTFIDF();
 	}
-	
+
+	public static void printTFIDF() throws IOException{
+		Index indexer = new WikiIndex();
+		IndexController ic = new IndexController(indexer);
+		List<String> urls = new WikiCrawler().getCrawled();
+		System.out.println("URLS: " + urls);
+		ic.indexUrls(urls);
+		indexer.printIndex();
+		Set<String> terms = indexer.keySet();
+		for(String term : terms){
+			for(String url : urls){
+				System.out.println("TF-IDF of term: " + term + " for URL: " + url +" is: " + ic.tfIdf(term, url));
+			}
+		}
+	}
+
 }

@@ -25,8 +25,10 @@ public class Main {
 		for(String term : terms){
 			for(String url : urls){
 				System.out.println("TF-IDF of term: " + term + " for URL: " + url +" is: " + ic.tfIdf(term, url));
+				System.out.println("Normalized TF-IDF of term: " + term + " for URL: " + url +" is: " + ic.normalizedTfIdf(term, url));
 			}
 		}
+		
 	}
 
 }

@@ -1,4 +1,4 @@
-package controller;
+package index;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,9 +8,14 @@ import java.util.Set;
 import org.jsoup.select.Elements;
 
 import fetcher.Fetcher;
-import index.Document;
-import index.Index;
-import index.TermCounter;
+import search.Document;
+
+/**
+ * Provides 
+ * 
+ * @param args
+ * @throws IOException
+ */
 
 public class IndexController {
 

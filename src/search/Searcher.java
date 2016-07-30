@@ -1,4 +1,4 @@
-package controller;
+package search;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,17 +7,18 @@ import java.util.PriorityQueue;
 import java.util.Scanner;
 
 import crawler.WikiCrawler;
-import index.Document;
 import index.Index;
+import index.IndexController;
 import index.WikiIndex;
 
-public class SearchController {
+public class Searcher {
 	
 	private Index indexer;
 	private IndexController ic;
 	private List<String> urls;
+	private PriorityQueue<Document> results;
 	
-	public SearchController() throws IOException{
+	public Searcher() throws IOException{
 		indexer = new WikiIndex();
 		ic = new IndexController(indexer);
 		urls = new WikiCrawler().getCrawled();
@@ -34,16 +35,16 @@ public class SearchController {
 		ic.indexUrls(urls);
 		ic.calculateTfidf();
 		List<Document> documents = ic.getDocuments();
-		PriorityQueue<Document> docQueue = new PriorityQueue<Document>(documents.size(), new DocumentComparator(phrase));
+		results = new PriorityQueue<Document>(documents.size(), new DocumentComparator(phrase));
 		for(Document doc : documents){
-			docQueue.add(doc);
+			results.add(doc);
 		}
 		System.out.println("\nYou searched for: " + phrase+". Enjoy your results.");
-		List<Document> results = new ArrayList<>(); 
-		while(!docQueue.isEmpty()){
-			results.add(docQueue.poll());
+		List<Document> res = new ArrayList<>(); 
+		while(!results.isEmpty()){
+			res.add(results.poll());
 		}
-		return results;
+		return res;
 	}
 
 }

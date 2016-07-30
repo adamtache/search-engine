@@ -1,8 +1,6 @@
-package controller;
+package search;
 
 import java.util.Comparator;
-
-import index.Document;
 
 public class DocumentComparator implements Comparator<Document>{
 	

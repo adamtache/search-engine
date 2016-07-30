@@ -14,7 +14,7 @@ public class DocumentComparator implements Comparator<Document>{
 	
 	@Override
 	public int compare(Document d1, Document d2){
-		return (int) (d1.get(search) - d2.get(search));
+		return (int) (d2.get(search) - d1.get(search));
 	}
 	
 }

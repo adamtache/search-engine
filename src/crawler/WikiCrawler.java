@@ -18,6 +18,14 @@ import org.jsoup.nodes.Element;
 public class WikiCrawler extends Crawler{
 
 	final static WikiFetcher wf = new WikiFetcher();
+	
+	public List<String> getCrawled() throws IOException{
+		String random = this.getRandomURL();
+		String start = random.substring(random.indexOf("/wiki/"));
+		String philosophy = this.getPhilosophyURL();
+		String goal = philosophy.substring(philosophy.indexOf("/wiki/"));
+		return this.getCrawled(start, goal);
+	}
 
 	/**
 	 * Gets list of crawled Wikipedia pages from a starting page to a goal page.
@@ -25,10 +33,8 @@ public class WikiCrawler extends Crawler{
 	 *
 	 * @throws IOException
 	 */
-	public List<String> getCrawled() throws IOException{
-		String goal = this.getGoalURL();
+	public List<String> getCrawled(String url, String goal) throws IOException{
 		List<String> crawled = new ArrayList<>();
-		String url = this.getStartURL();
 		crawled.add(url);
 		boolean foundLink = false;
 		boolean end = false;

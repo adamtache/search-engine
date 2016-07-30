@@ -37,7 +37,7 @@ public class IndexController {
 		for(String term : terms){
 			for(TermCounter tc : indexer.get(term)){
 				String url = tc.getLabel();
-				double tfidf = normalizedTfIdf(term, url);
+				double tfidf = tfIdf(term, url);
 				getDocument(url).add(term, tfidf);
 			}
 		}

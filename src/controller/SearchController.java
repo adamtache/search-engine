@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Scanner;
@@ -23,21 +24,26 @@ public class SearchController {
 	}
 	
 	public void search() throws IOException{
+		Scanner sc = new Scanner(System.in);
+		System.out.println("What do you want to search for?");
+		String phrase = sc.nextLine();
+		search(phrase);
+	}
+	
+	public List<Document> search(String phrase) throws IOException{
 		ic.indexUrls(urls);
 		ic.calculateTfidf();
 		List<Document> documents = ic.getDocuments();
-		Scanner sc = new Scanner(System.in);
-		System.out.println("What do you want to search for?");
-		String search = sc.nextLine();
-		PriorityQueue<Document> docQueue = new PriorityQueue<Document>(documents.size(), new DocumentComparator(search));
+		PriorityQueue<Document> docQueue = new PriorityQueue<Document>(documents.size(), new DocumentComparator(phrase));
 		for(Document doc : documents){
 			docQueue.add(doc);
 		}
-		System.out.println("\nYou searched for: " + search+". Enjoy your results.");
+		System.out.println("\nYou searched for: " + phrase+". Enjoy your results.");
+		List<Document> results = new ArrayList<>(); 
 		while(!docQueue.isEmpty()){
-			Document doc = docQueue.poll();
-			System.out.println(doc.getUrl()+" TFIDF: " + doc.get(search));
+			results.add(docQueue.poll());
 		}
+		return results;
 	}
 
 }

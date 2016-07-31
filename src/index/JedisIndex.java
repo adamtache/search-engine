@@ -18,7 +18,7 @@ import redis.clients.jedis.Transaction;
  * Represents a Redis-backed web search index.
  * 
  */
-public class JedisIndex {
+public class JedisIndex implements IIndex {
 
 	private Jedis jedis;
 	private WikiFetcher wf;

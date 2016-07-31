@@ -1,5 +1,4 @@
 package view;
-import java.util.PriorityQueue;
 
 import controller.IController;
 import javafx.geometry.Pos;
@@ -12,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import search.Document;
+import search.ISearchResult;
 
 public class MainScreen implements IScreen {
 	
@@ -31,7 +30,7 @@ public class MainScreen implements IScreen {
 	}
 	
 	@Override
-	public void displayResults(PriorityQueue<Document> results){
+	public void displayResults(ISearchResult results){
 		
 	}
 	

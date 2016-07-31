@@ -35,7 +35,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * @param index
 	 */
 	public JedisWikiCrawler(JedisIndex index) {
-		this.source = super.getRandomURL();
+		this.source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
 		this.index = index;
 		queue.offer(source);
 	}

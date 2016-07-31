@@ -1,9 +1,8 @@
 package view;
 
-import java.util.PriorityQueue;
 import controller.IController;
 import javafx.stage.Stage;
-import search.Document;
+import search.ISearchResult;
 
 public class View implements IView {
 	
@@ -20,8 +19,8 @@ public class View implements IView {
 	}
 
 	@Override
-	public void display(PriorityQueue<Document> results) {
-		
+	public void display(ISearchResult results) {
+		results.print();
 	}
 
 	@Override

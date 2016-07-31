@@ -1,9 +1,7 @@
 package controller;
 
 import java.io.IOException;
-import java.util.PriorityQueue;
-
-import search.Document;
+import search.ISearchResult;
 import search.ISearcher;
 import search.Searcher;
 import view.IView;
@@ -37,17 +35,14 @@ public class Controller implements IController {
 	}
 
 	@Override
-	public PriorityQueue<Document> getResults() {
+	public ISearchResult getResults() {
 		return searcher.getResults(view.getSearchTerm());
 	}
 
 	@Override
 	public String getResultUrl(int result) {
-		PriorityQueue<Document> results = getResults();
-		for(int x=0; x<result; x++){
-			results.poll();
-		}
-		return results.poll().getUrl();
+		ISearchResult search_result = getResults();
+		return search_result.getUrl(result);
 	}
 
 }

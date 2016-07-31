@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import index.IIndex;
 import index.JedisIndex;
 import index.JedisMaker;
 import redis.clients.jedis.Jedis;
@@ -18,10 +19,11 @@ import redis.clients.jedis.Jedis;
  * Represents the results of a search query.
  *
  */
-public class WikiSearch {
+public class WikiSearch implements ISearchResult {
 
 	// map from URLs that contain the term(s) to relevance score
-	private Map<String, Integer> map;
+	private Map<String, Integer> counts; // URL -> term count
+	private Map<String, Double> tfIdfs; // URL -> TF-IDF value
 
 	/**
 	 * Constructor.
@@ -29,7 +31,7 @@ public class WikiSearch {
 	 * @param map2
 	 */
 	public WikiSearch(Map<String, Integer> map2) {
-		this.map = map2;
+		this.counts = map2;
 	}
 
 	/**
@@ -39,7 +41,7 @@ public class WikiSearch {
 	 * @return
 	 */
 	public Integer getRelevance(String url) {
-		Integer relevance = map.get(url);
+		Integer relevance = counts.get(url);
 		return relevance==null ? 0: relevance;
 	}
 
@@ -48,7 +50,7 @@ public class WikiSearch {
 	 * 
 	 * @param map
 	 */
-	private  void print() {
+	public void print() {
 		List<Entry<String, Integer>> entries = sort();
 		if(entries == null){
 			return;
@@ -62,11 +64,11 @@ public class WikiSearch {
 	 * Computes the union of two search results.
 	 * 
 	 * @param that
-	 * @return New WikiSearch object.
+	 * @return New ISearchResult object.
 	 */
-	public WikiSearch or(WikiSearch that) {
-		Map<String, Integer> orMap = new HashMap<>(map);
-		Set<String> thatTerms = that.map.keySet();
+	public ISearchResult or(ISearchResult that) {
+		Map<String, Integer> orMap = new HashMap<>(counts);
+		Set<String> thatTerms = that.getCounts().keySet();
 		for(String thatTerm : thatTerms){
 			orMap.put(thatTerm, totalRelevance(that, thatTerm));
 		}
@@ -77,12 +79,12 @@ public class WikiSearch {
 	 * Computes the intersection of two search results.
 	 * 
 	 * @param that
-	 * @return New WikiSearch object.
+	 * @return New ISearchResult object.
 	 */
-	public WikiSearch and(WikiSearch that) {
+	public ISearchResult and(ISearchResult that) {
 		Map<String, Integer> andMap = new HashMap<>();
-		for(String thatTerm : that.map.keySet()){
-			if(this.map.containsKey(thatTerm)){
+		for(String thatTerm : that.getCounts().keySet()){
+			if(this.counts.containsKey(thatTerm)){
 				andMap.put(thatTerm, totalRelevance(that, thatTerm));
 			}
 		}
@@ -93,17 +95,17 @@ public class WikiSearch {
 	 * Computes the intersection of two search results.
 	 * 
 	 * @param that
-	 * @return New WikiSearch object.
+	 * @return New ISearchResult object.
 	 */
-	public WikiSearch minus(WikiSearch that) {
-		Map<String, Integer> minusMap = new HashMap<>(map);
-		for(String thatTerm : that.map.keySet()){
+	public ISearchResult minus(ISearchResult that) {
+		Map<String, Integer> minusMap = new HashMap<>(counts);
+		for(String thatTerm : that.getCounts().keySet()){
 			minusMap.remove(thatTerm);
 		}
 		return new WikiSearch(minusMap);
 	}
 
-	private Integer totalRelevance(WikiSearch that, String term){
+	private Integer totalRelevance(ISearchResult that, String term){
 		return totalRelevance(that.getRelevance(term), this.getRelevance(term));
 	}
 
@@ -125,61 +127,101 @@ public class WikiSearch {
 	 * @return List of entries with URL and relevance.
 	 */
 	public List<Entry<String, Integer>> sort() {
-		List<Entry<String, Integer>> entries = new ArrayList<>(map.entrySet());
+		List<Entry<String, Integer>> entries = new ArrayList<>(counts.entrySet());
 		Comparator<Entry<String, Integer>> comparator = new RelevanceComparator();
 		Collections.sort(entries, comparator);
 		return entries;
 	}
 
-	/**
-	 * Performs a search and makes a WikiSearch object.
-	 * 
-	 * @param term
-	 * @param index
-	 * @return
-	 */
-	public static WikiSearch search(String term, JedisIndex index) {
-		Map<String, Integer> map = index.getCounts(term);
-		return new WikiSearch(map);
-	}
-
 	public static void main(String[] args) throws IOException {
 
-		// make a JedisIndex
+		// make a IIndex
 		Jedis jedis = JedisMaker.make();
-		JedisIndex index = new JedisIndex(jedis); 
+		IIndex index = new JedisIndex(jedis);
 
 		// search for the first term
 		String term1 = "java";
 		System.out.println("Query: " + term1);
-		WikiSearch search1 = search(term1, index);
+		ISearchResult search1 = SearchResultFactory.search(term1, index);
 		search1.print();
 
 		// search for the second term
 		String term2 = "programming";
 		System.out.println("Query: " + term2);
-		WikiSearch search2 = search(term2, index);
+		ISearchResult search2 = SearchResultFactory.search(term2, index);
 		search2.print();
 
 		// compute the intersection of the searches
 		System.out.println("Query: " + term1 + " AND " + term2);
-		WikiSearch intersection = search1.and(search2);
+		ISearchResult intersection = search1.and(search2);
 		if(intersection != null)
 			intersection.print();
 	}
 	
 	public int getNumUrls(){
-		return this.map.keySet().size();
+		return this.counts.keySet().size();
 	}
 
 	public int getNumUrlsWithTerm(String term) {
 		int count = 0;
-		for(String url : map.keySet()){
-			if(map.get(url) > 0){
+		for(String url : counts.keySet()){
+			if(counts.get(url) > 0){
 				count++;
 			}
 		}
 		return count;
+	}
+
+	@Override
+	public String getUrl(int result) {
+		return this.sort().get(result).getKey();
+	}
+	
+	@Override
+	public Map<String, Integer> getCounts(){
+		return this.counts;
+	}
+	
+//	public double normalizedTfIdf(String term, String url, WikiSearch search){
+	//	return this.normalizedTf(search, url) * this.idf(search, term);
+	//}
+
+	//	public double normalizedTf(WikiSearch search, String url){
+	//		return search.getRelevance(url)/getDocEuclideanNorm(url);
+	//	}
+	//
+	//	private double getDocEuclideanNorm(String url){
+	//		List<Integer> documentVector = this.getDocumentVector(url);
+	//		double euclideanNorm = 0;
+	//		for(Integer freq : documentVector){
+	//			euclideanNorm += freq*freq;
+	//		}
+	//		return Math.sqrt(euclideanNorm);
+	//	}
+	//
+	//	private List<Integer> getDocumentVector(String url){
+	//		List<Integer> documentVector = new ArrayList<>();
+	//		for(String term : indexer.keySet()){
+	//			for(TermCounter tc : indexer.get(term)){
+	//				if(tc.getLabel().equals(url)){
+	//					documentVector.add(tc.get(term));
+	//				}
+	//			}
+	//		}
+	//		return documentVector;
+	//	}
+	
+	@Override
+	public double tfIdf(String url, String term){
+		return getRelevance(url) * this.idf(term);
+	}
+	
+	@Override
+	public double idf(String term){
+		int numDocuments = getNumUrls();
+		int documentFrequency = 0;
+		getNumUrlsWithTerm(term);
+		return Math.log((double) numDocuments/documentFrequency);
 	}
 	
 }

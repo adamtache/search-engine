@@ -1,8 +1,6 @@
 package controller;
 
-import java.util.PriorityQueue;
-
-import search.Document;
+import search.ISearchResult;
 import view.IView;
 
 public interface IController {
@@ -13,7 +11,7 @@ public interface IController {
 	
 	public abstract void go_to(int page);
 
-	public abstract PriorityQueue<Document> getResults();
+	public abstract ISearchResult getResults();
 
 	public abstract String getResultUrl(int result);
 

@@ -10,8 +10,11 @@ public class ButtonSetup {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				System.out.println("Search button pressed.");
 				controller.search(term);
+				System.out.println("Finished search.");
 				controller.display();
+				System.out.println("Finished displaying. Done.");
 			}
 		};
 	}

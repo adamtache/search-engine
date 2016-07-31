@@ -308,12 +308,17 @@ public class JedisIndex implements IIndex {
 	@Override
 	public PriorityQueue<Entry<String, Double>> getTfIds(String term) {
 		int numURLs = getURLs(term).size();
+		System.out.println("Number URLs for term: " + numURLs);
 		if(numURLs == 0){
 			return new PriorityQueue<Entry<String, Double>>();
 		}
 		PriorityQueue<Entry<String, Double>> results = new PriorityQueue<Entry<String, Double>>(numURLs, new ResultsComparator());
+		System.out.println("URLS: ~~~~~~~~~~~~~~~~~~~~~~ " + getURLs(term));
 		for(String url : getURLs(term)){
-			Entry<String, Double> result = new AbstractMap.SimpleEntry<String, Double>(url, tfIdf(url, term));
+			System.out.println("Calculating TFIDF for " + term+" for URL: " + url);
+			double tfIdf = this.tfIdf(url, term);
+			Entry<String, Double> result = new AbstractMap.SimpleEntry<String, Double>(url, tfIdf);
+			System.out.println("TFIDF Calculation done.");
 			results.add(result);
 		}
 		return results;
@@ -332,15 +337,16 @@ public class JedisIndex implements IIndex {
 	@Override
 	public Double tfIdf(String url, String term){
 		double tf = getCount(url, term);
-		System.out.println("Term Frequency: " + tf);
+		System.out.println("Index determined TF to be: "+tf+".");
 		return tf * this.idf(term);
 	}
 
 	@Override
 	public Double idf(String term){
+		System.out.println("Index determing IDF.");
 		int numDocuments = getNumUrls();
-		int documentFrequency = getURLs(term).size();
 		System.out.println("Num Documents: " + numDocuments);
+		int documentFrequency = getURLs(term).size();
 		System.out.println("Document Frequency: " + documentFrequency);
 		return Math.log((double) numDocuments/documentFrequency);
 	}

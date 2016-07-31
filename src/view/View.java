@@ -1,9 +1,4 @@
 package view;
-
-import java.util.Map.Entry;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
 import controller.IController;
 import javafx.stage.Stage;
 
@@ -23,14 +18,8 @@ public class View implements IView {
 	
 	@Override
 	public void display() {
-		PriorityQueue<Entry<String, Double>> results = controller.getResults();
-		List<Entry<String, Double>> temp = new ArrayList<>();
-		for(int x=0; x<results.size(); x++){
-			Entry<String, Double> result = results.poll();
-			System.out.println(result.getKey()+" "+result.getValue());
-			temp.add(result);
-		}
-		results.addAll(temp);
+		System.out.println("View telling MainScreen to display results.");
+		mainScreen.display(controller.getResults());
 	}
 
 	@Override

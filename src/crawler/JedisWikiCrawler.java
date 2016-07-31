@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import fetcher.WikiFetcher;
+import index.IIndex;
 import index.JedisIndex;
 import index.JedisMaker;
 import redis.clients.jedis.Jedis;
@@ -20,7 +21,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 	private final String source;
 
 	// the index where the results go
-	private JedisIndex index;
+	private IIndex index;
 
 	// queue of URLs to be indexed
 	private Queue<String> queue = new LinkedList<String>();
@@ -32,11 +33,11 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * Constructor.
 	 * 
 	 * @param source
-	 * @param index
+	 * @param index2
 	 */
-	public JedisWikiCrawler(JedisIndex index) {
+	public JedisWikiCrawler(IIndex index2) {
 		this.source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		this.index = index;
+		this.index = index2;
 		queue.offer(source);
 	}
 

@@ -1,12 +1,11 @@
 package view;
 
-import search.ISearchResult;
+import search.ISearchData;
 
 public interface IScreen {
 
-	
 	public abstract void display(int result);
 
-	public abstract void displayResults(ISearchResult results);
+	public abstract void display(ISearchData data);
 	
 }

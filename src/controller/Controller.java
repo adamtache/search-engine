@@ -1,10 +1,7 @@
 package controller;
 
 import java.io.IOException;
-import java.util.PriorityQueue;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
+import search.ISearchData;
 import search.ISearcher;
 import search.Searcher;
 import view.IView;
@@ -24,11 +21,13 @@ public class Controller implements IController {
 
 	@Override
 	public void search(String term) {
+		System.out.println("Controller telling searcher to search.");
 		searcher.search(term);
 	}
 
 	@Override
 	public void display() {
+		System.out.println("Controller telling view to display data.");
 		view.display();
 	}
 	
@@ -38,25 +37,14 @@ public class Controller implements IController {
 	}
 
 	@Override
-	public PriorityQueue<Entry<String, Double>> getResults() {
+	public ISearchData getResults() {
+		System.out.println("View getting results from searcher to send to MainScreen.");
 		return searcher.getResults(view.getSearchTerm());
 	}
 
 	@Override
 	public String getResultUrl(int result) {
-		PriorityQueue<Entry<String, Double>> search_result = getResults();
-		if(search_result.size() == 0){
-			return "http://www.google.com";
-		}
-		List<Entry<String, Double>> temp = new ArrayList<>();
-		for(int x=0; x<result; x++){
-			temp.add(search_result.poll());
-		}
-		Entry<String, Double> resultEntry = search_result.poll();
-		temp.add(resultEntry);
-		String resultUrl = resultEntry.getKey();
-		search_result.addAll(temp);
-		return resultUrl;
+		return getResults().get(result);
 	}
 
 }

@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import search.ISearchResult;
+import search.ISearchData;
 
 public class MainScreen implements IScreen {
 	
@@ -30,8 +30,9 @@ public class MainScreen implements IScreen {
 	}
 	
 	@Override
-	public void displayResults(ISearchResult results){
-		
+	public void display(ISearchData data){
+		System.out.println("MainScreen printing data.");
+		data.print();
 	}
 	
 	@Override

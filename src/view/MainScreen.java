@@ -1,36 +1,31 @@
 package view;
 
+import java.util.List;
+import java.util.Map.Entry;
+
 import controller.IController;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import search.ISearchData;
 
 public class MainScreen implements IScreen {
 
-	private static final int HBOX_SPACING = 10;
-	private static final int VBOX_SPACING = 20;
-	private TextField textField;
-	private WebEngine webEngine;
-	private WebView webView;
-	private Button searchButton;
-	private Button feelingLuckyButton;
-	private IController controller;
+	private IController myController;
 	private int myWidth;
 	private int myHeight;
-	private VBox myRoot;
+	private BorderPane myRoot;
+	private SearchBar mySearchBar;
 	private Scene myScene;
-
+	private LuckyResult myLuckyResult;
+	private StackPane myResultPane;
+	private VBox myStatusPane;
+	private SearchResult mySearchResult;
+	
 	public MainScreen(IController controller, int windowWidth, int windowHeight) {
-		this.controller = controller;
-		this.webView = new WebView();
-		this.webEngine = webView.getEngine();
+		this.myController = controller;
 		this.myWidth = windowWidth;
 		this.myHeight = windowHeight;
 		initialize();
@@ -38,75 +33,51 @@ public class MainScreen implements IScreen {
 
 	@Override
 	public void display(ISearchData data) {
-		System.out.println("MainScreen printing data.");
-		data.print();
+		updateStatus("MainScreen printing data");
+		myResultPane.getChildren().clear();
+		myResultPane.getChildren().add(mySearchResult.getNode());
+		List<Entry<String,Double>> dataEntries = data.getEntries();
+		for(Entry<String,Double> dataEntry: dataEntries){
+			mySearchResult.addResult(dataEntry.getKey());
+		}
 	}
 
 	@Override
 	public void display(int result) {
-		this.webEngine.load(controller.getResultUrl(result));
+		myLuckyResult.display(result);
 	}
 
 	private void initialize() {
-		myRoot = this.makeVbox();
-		HBox hbox = this.makeHbox();
-		this.textField = new TextField();
-		setupSearchButton(searchButton);
-		setupFeelingLuckyButton(feelingLuckyButton);
-		hbox.getChildren().addAll(textField, searchButton, feelingLuckyButton);
-		myRoot.getChildren().add(hbox);
-		setupScrollPane();
-		myRoot.getChildren().add(webView);
+		myRoot = new BorderPane();
+		myResultPane = new StackPane();
+		createStatusPane();
+		mySearchBar = new SearchBar(myController);
+		myLuckyResult = new LuckyResult(myController, myResultPane);
+		mySearchResult = new SearchResult();
+		myRoot.setTop(mySearchBar.getNode());
+		myResultPane.getChildren().add(mySearchResult.getNode());
+		myRoot.setCenter(myResultPane);
+		myRoot.setBottom(myStatusPane);
 		myScene = new Scene(myRoot, myWidth, myHeight);
 	}
-
-	private void setupSearchButton(Button searchButton) {
-		this.searchButton = new Button("Search");
-		this.searchButton.setOnAction(event -> {
-			System.out.println("Search button pressed.");
-			controller.search(getSearchTerm());
-			System.out.println("Finished search.");
-			controller.display();
-			System.out.println("Finished displaying. Done.");
-		});
+	
+	private void createStatusPane(){
+		myStatusPane = new VBox();
+		Label myStatus = new Label("Awaiting user input.");
+		myStatusPane.getChildren().add(myStatus);
+		//TODO : make a scrollpane
 	}
-
-	private void setupFeelingLuckyButton(Button feelingLuckyButton) {
-		this.feelingLuckyButton = new Button("Feeling lucky?");
-		this.feelingLuckyButton.setOnAction(event -> {
-			controller.search(getSearchTerm());
-			controller.display();
-			controller.goTo(0);
-		});
-	}
-
-	private void setupScrollPane() {
-		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setContent(webView);
-		scrollPane.getStyleClass().add("noborder-scroll-pane");
-		scrollPane.setStyle("-fx-background-color: white");
-		scrollPane.setFitToWidth(true);
-		scrollPane.setFitToHeight(true);
-	}
-
-	private HBox makeHbox() {
-		HBox hbox = new HBox(HBOX_SPACING);
-		hbox.setAlignment(Pos.CENTER);
-		return hbox;
-	}
-
-	private VBox makeVbox() {
-		VBox vbox = new VBox(VBOX_SPACING);
-		vbox.setAlignment(Pos.CENTER);
-		return vbox;
-	}
-
-	public String getSearchTerm() {
-		return this.textField.getText();
+	
+	public void updateStatus(String status){
+		myStatusPane.getChildren().add(new Label(status));
 	}
 
 	public Scene getScene() {
 		return myScene;
+	}
+	
+	public String getSearchTerm(){
+		return mySearchBar.getSearchTerm();
 	}
 
 }

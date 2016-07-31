@@ -35,17 +35,24 @@ public class SearchData implements ISearchData {
 		data.addAll(temp);
 		return resultEntry.getKey();
 	}
-
+	
 	@Override
-	public void print() {
-		List<Entry<String, Double>> temp = new ArrayList<>();
+	public void print(){
+		List<Entry<String,Double>> entries = getEntries();
 		System.out.println("Data size: " + data.size());
+		for(Entry<String,Double> dataEntry: entries){
+			System.out.println("Visited: " + dataEntry.getKey()+" TF-IDF: " + dataEntry.getValue());
+		}
+	}
+	
+	public List<Entry<String,Double>> getEntries(){
+		List<Entry<String, Double>> temp = new ArrayList<>();
 		for(int x=0; x<data.size(); x++){
 			Entry<String, Double> dataEntry = data.poll();
 			temp.add(dataEntry);
-			System.out.println("Visited: " + dataEntry.getKey()+" TF-IDF: " + dataEntry.getValue());
 		}
 		data.addAll(temp);
+		return temp;
 	}
 	
 }

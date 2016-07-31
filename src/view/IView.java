@@ -12,4 +12,6 @@ public interface IView {
 
 	public abstract Scene getScene();
 	
+	public void updateStatus(String status);
+	
 }

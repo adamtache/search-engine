@@ -14,6 +14,8 @@ import index.IIndex;
 import index.JedisIndex;
 import index.JedisMaker;
 import redis.clients.jedis.Jedis;
+import view.IView;
+import view.View;
 
 
 public class JedisWikiCrawler extends WikiCrawler{
@@ -28,6 +30,8 @@ public class JedisWikiCrawler extends WikiCrawler{
 
 	// fetcher used to get pages from Wikipedia
 	final static WikiFetcher wf = new WikiFetcher();
+	
+	private IView myView;
 
 	/**
 	 * Constructor.
@@ -35,9 +39,10 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * @param source
 	 * @param index2
 	 */
-	public JedisWikiCrawler(IIndex index2) {
+	public JedisWikiCrawler(IIndex index2, IView view) {
 		this.source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
 		this.index = index2;
+		this.myView = view;
 		queue.offer(source);
 	}
 
@@ -47,9 +52,10 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * @param source
 	 * @param index
 	 */
-	public JedisWikiCrawler(String source, JedisIndex index) {
+	public JedisWikiCrawler(String source, JedisIndex index, IView view) {
 		this.source = source;
 		this.index = index;
+		this.myView = view;
 		queue.offer(source);
 	}
 
@@ -74,7 +80,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 			return null;
 		} else {
 			String crawlURL = queue.poll();
-			System.out.println("CRAWLED: " + crawlURL);
+			myView.updateStatus("CRAWLED: " + crawlURL);
 			Elements paragraphs;
 			if (index.isIndexed(crawlURL)) {
 				return null;
@@ -107,9 +113,9 @@ public class JedisWikiCrawler extends WikiCrawler{
 	public static void main(String[] args) throws IOException {
 		// make a WikiCrawler
 		Jedis jedis = JedisMaker.make();
-		JedisIndex index = new JedisIndex(jedis); 
+		JedisIndex index = new JedisIndex(jedis, new View(500,500)); 
 		String source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		JedisWikiCrawler wc = new JedisWikiCrawler(source, index);
+		JedisWikiCrawler wc = new JedisWikiCrawler(source, index, new View(500,500));
 
 		// for testing purposes, load up the queue
 		Elements paragraphs = wf.fetch(source);

@@ -29,7 +29,7 @@ public class View implements IView {
 	
 	@Override
 	public void display() {
-		System.out.println("View telling MainScreen to display results.");
+		myMainScreen.updateStatus("View telling MainScreen to display results.");
 		myMainScreen.display(myController.getResults());
 	}
 
@@ -45,5 +45,9 @@ public class View implements IView {
 	
 	public Scene getScene(){
 		return myMainScreen.getScene();
+	}
+	
+	public void updateStatus(String status){
+		myMainScreen.updateStatus(status);
 	}
 }

@@ -1,7 +1,6 @@
 package search;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import crawler.JedisWikiCrawler;
@@ -10,22 +9,26 @@ import index.JedisIndex;
 import index.JedisMaker;
 import redis.clients.jedis.Jedis;
 
-public class Searcher {
+public class Searcher implements ISearcher {
 	
 	private JedisIndex index;
 	private IndexController ic;
 	private JedisWikiCrawler crawler;
 	private PriorityQueue<Document> results;
 	
-	public Searcher() throws IOException{
+	public Searcher() throws IOException {
 		Jedis jedis = JedisMaker.make();
 		index = new JedisIndex(jedis);
 		ic = new IndexController();
 		crawler = new JedisWikiCrawler(index);
 	}
 	
-	public List<Document> search(String term) throws IOException{
-		crawler.crawl();
+	public void search(String term) {
+		clearDatabase();
+		crawl();
+	}
+	
+	public PriorityQueue<Document> getResults(String term) {
 		WikiSearch search = WikiSearch.search(term, index);
 		ic.calculateTfidf(term, search);
 		List<Document> documents = ic.getDocuments();
@@ -34,11 +37,17 @@ public class Searcher {
 			results.add(doc);
 		}
 		System.out.println("\nYou searched for: " + term+". Enjoy your results.");
-		List<Document> res = new ArrayList<>(); 
-		while(!results.isEmpty()){
-			res.add(results.poll());
-		}
-		return res;
+		return results;
+	}
+	
+	private void crawl() {
+		crawler.crawl();
+	}
+	
+	private void clearDatabase(){
+		index.deleteAllKeys();
+		index.deleteTermCounters();
+		index.deleteURLSets();
 	}
 
 }

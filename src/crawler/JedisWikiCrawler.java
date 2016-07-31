@@ -68,7 +68,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * @return Number of pages indexed.
 	 * @throws IOException
 	 */
-	public String crawl() throws IOException {
+	public String crawl() {
 		if (queue.isEmpty()) {
 			return null;
 		} else {

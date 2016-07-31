@@ -17,12 +17,17 @@ public class WikiFetcher extends Fetcher{
 	 * @return
 	 * @throws IOException
 	 */
-	public Elements fetch(String url) throws IOException {
+	public Elements fetch(String url) {
 		sleepIfNeeded();
 
 		// download and parse the document
 		Connection conn = Jsoup.connect(url);
-		Document doc = conn.get();
+		Document doc = null;
+		try {
+			doc = conn.get();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		// select the content text and pull out the paragraphs.
 		Element content = doc.getElementById("mw-content-text");

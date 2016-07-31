@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import search.Document;
 import search.WikiSearch;
-import java.util.Set;
-import java.util.Map;
 
 /**
  * Provides 

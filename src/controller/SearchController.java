@@ -3,7 +3,6 @@ package controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Scanner;
 
 import crawler.WikiCrawler;
 import index.Document;
@@ -22,13 +21,14 @@ public class SearchController {
 		urls = new WikiCrawler().getCrawled();
 	}
 	
-	public void search() throws IOException{
+	public void search(String searchTerm) throws IOException{
 		ic.indexUrls(urls);
 		ic.calculateTfidf();
 		List<Document> documents = ic.getDocuments();
-		Scanner sc = new Scanner(System.in);
+//		Scanner sc = new Scanner(System.in);
 		System.out.println("What do you want to search for?");
-		String search = sc.nextLine();
+//		String search = sc.nextLine();
+		String search = searchTerm;
 		PriorityQueue<Document> docQueue = new PriorityQueue<Document>(documents.size(), new DocumentComparator(search));
 		for(Document doc : documents){
 			docQueue.add(doc);

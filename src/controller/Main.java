@@ -18,8 +18,8 @@ public class Main extends Application{
 	@Override
 	public void start(Stage stage) throws Exception {
 		sc = new Searcher();
-		view = new View(stage, sc);
-		
+		view = new View(sc);
+		view.initialize(stage);
 	}
 	
 }

@@ -22,9 +22,8 @@ public class View {
 	
 	private Searcher sc;
 
-	public View(Stage stage, Searcher sc) throws IOException {
+	public View(Searcher sc) throws IOException {
 		this.sc = sc;
-		initialize(stage);
 	}
 
 	public void initialize(Stage stage) throws IOException{
@@ -96,7 +95,7 @@ public class View {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				webEngine.load("https://en.wikipedia.org" + results.get(0).getUrl());
+				webEngine.load(results.get(0).getUrl());
 			}
 		};
 	}

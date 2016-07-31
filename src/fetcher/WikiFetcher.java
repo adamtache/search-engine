@@ -1,10 +1,6 @@
 package fetcher;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,30 +28,6 @@ public class WikiFetcher extends Fetcher{
 		Element content = doc.getElementById("mw-content-text");
 
 		// TODO: avoid selecting paragraphs from sidebars and boxouts
-		Elements paras = content.select("p");
-		return paras;
-	}
-
-	/**
-	 * Reads the contents of a Wikipedia page from src/resources.
-	 *
-	 * @param url
-	 * @return
-	 * @throws IOException
-	 */
-	public Elements read(String url) throws IOException {
-		URL realURL = new URL(url);
-
-		// assemble the file name
-		String slash = File.separator;
-		String filename = "resources" + slash + realURL.getHost() + realURL.getPath();
-
-		// read the file
-		InputStream stream = WikiFetcher.class.getClassLoader().getResourceAsStream(filename);
-		Document doc = Jsoup.parse(stream, "UTF-8", filename);
-
-		// TODO: factor out the following repeated code
-		Element content = doc.getElementById("mw-content-text");
 		Elements paras = content.select("p");
 		return paras;
 	}

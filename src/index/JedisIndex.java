@@ -1,8 +1,6 @@
 package index;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +9,7 @@ import java.util.List;
 
 import org.jsoup.select.Elements;
 
+import fetcher.Fetcher;
 import fetcher.WikiFetcher;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
@@ -22,6 +21,7 @@ import redis.clients.jedis.Transaction;
 public class JedisIndex {
 
 	private Jedis jedis;
+	private WikiFetcher wf;
 
 	/**
 	 * Constructor.
@@ -30,6 +30,7 @@ public class JedisIndex {
 	 */
 	public JedisIndex(Jedis jedis) {
 		this.jedis = jedis;
+		this.wf = new WikiFetcher();
 	}
 	
 	/**
@@ -295,40 +296,8 @@ public class JedisIndex {
 		t.exec();
 	}
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		Jedis jedis = JedisMaker.make();
-		JedisIndex index = new JedisIndex(jedis);
-		
-		//index.deleteTermCounters();
-		//index.deleteURLSets();
-		//index.deleteAllKeys();
-		loadIndex(index);
-		
-		Map<String, Integer> map = index.getCountsFaster("the");
-		for (Entry<String, Integer> entry: map.entrySet()) {
-			System.out.println(entry);
-		}
+	public Fetcher getFetcher() {
+		return wf;
 	}
-
-	/**
-	 * Stores two pages in the index for testing purposes.
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	private static void loadIndex(JedisIndex index) throws IOException {
-		WikiFetcher wf = new WikiFetcher();
-
-		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		Elements paragraphs = wf.read(url);
-		index.indexPage(url, paragraphs);
-		
-		url = "https://en.wikipedia.org/wiki/Programming_language";
-		paragraphs = wf.read(url);
-		index.indexPage(url, paragraphs);
-	}
+	
 }

@@ -26,10 +26,10 @@ public class WikiSearch {
 	/**
 	 * Constructor.
 	 * 
-	 * @param map
+	 * @param map2
 	 */
-	public WikiSearch(Map<String, Integer> map) {
-		this.map = map;
+	public WikiSearch(Map<String, Integer> map2) {
+		this.map = map2;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class WikiSearch {
 	 * @param rel2: relevance score for the second search
 	 * @return
 	 */
-	protected int totalRelevance(Integer rel1, Integer rel2) {
+	protected Integer totalRelevance(Integer rel1, Integer rel2) {
 		// simple starting place: relevance is the sum of the term frequencies.
 		return rel1 + rel2;
 	}
@@ -167,4 +167,19 @@ public class WikiSearch {
 		if(intersection != null)
 			intersection.print();
 	}
+	
+	public int getNumUrls(){
+		return this.map.keySet().size();
+	}
+
+	public int getNumUrlsWithTerm(String term) {
+		int count = 0;
+		for(String url : map.keySet()){
+			if(map.get(url) > 0){
+				count++;
+			}
+		}
+		return count;
+	}
+	
 }

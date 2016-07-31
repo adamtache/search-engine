@@ -1,14 +1,12 @@
 package index;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import org.jsoup.select.Elements;
-
-import fetcher.Fetcher;
+import java.util.Map.Entry;
 import search.Document;
+import search.WikiSearch;
+import java.util.Set;
+import java.util.Map;
 
 /**
  * Provides 
@@ -19,95 +17,64 @@ import search.Document;
 
 public class IndexController {
 
-	private Index indexer;
-	private Fetcher fetcher;
 	private List<Document> documents;
 
-	public IndexController(Index index){
-		this.indexer = index;
-		this.fetcher = index.getFetcher();
+	public IndexController(){
 		this.documents = new ArrayList<>();
 	}
 
-	public void indexUrls(List<String> urls) throws IOException{
-		for(String url : urls){
-			Elements paragraphs = fetcher.fetch("https://en.wikipedia.org" + url);
-			indexer.indexPage(url, paragraphs);
-			documents.add(new Document(url));
+	public void calculateTfidf(String term, WikiSearch search){
+		List<Entry<String, Integer>> counts = search.sort();
+		this.createDocuments(counts);
+		for(Document doc : documents){
+			doc.addTerm(term, this.tfIdf(doc.getUrl(), search, term));
 		}
 	}
 
-	public void calculateTfidf(){
-		Set<String> terms = indexer.keySet();
-		for(String term : terms){
-			for(TermCounter tc : indexer.get(term)){
-				String url = tc.getLabel();
-				double tfidf = tfIdf(term, url);
-				getDocument(url).add(term, tfidf);
-			}
-		}
+	public double tfIdf(String url, WikiSearch search, String term){
+		return search.getRelevance(url) * this.idf(search, term);
 	}
 
-	public double normalizedTfIdf(String term, String url){
-		return this.normalizedTf(term, url) * this.idf(term);
-	}
-
-	public double tfIdf(String term, String url){
-		return this.tf(term, url) * this.idf(term);
-	}
-
-	public double tf(String term, String url){
-		for(TermCounter tc : indexer.get(term)){
-			if(tc.getLabel().equals(url)){
-				return tc.get(term);
-			}
-		}
-		return 0;
-	}
-
-	public double idf(String term){
-		int numDocuments = indexer.getIndexed().size();
+	public double idf(WikiSearch search, String term){
+		int numDocuments = search.getNumUrls();
 		int documentFrequency = 0;
-		for(TermCounter tc : indexer.get(term)){
-			if(tc.get(term) > 0){
-				documentFrequency++;
-			}
-		}
+		search.getNumUrlsWithTerm(term);
 		return Math.log((double) numDocuments/documentFrequency);
 	}
 
-	public double normalizedTf(String term, String url){
-		return tf(term, url)/getDocEuclideanNorm(url);
-	}
+	//	public double normalizedTfIdf(String term, String url, WikiSearch search){
+	//	return this.normalizedTf(search, url) * this.idf(search, term);
+	//}
 
-	private double getDocEuclideanNorm(String url){
-		List<Integer> documentVector = this.getDocumentVector(url);
-		double euclideanNorm = 0;
-		for(Integer freq : documentVector){
-			euclideanNorm += freq*freq;
-		}
-		return Math.sqrt(euclideanNorm);
-	}
+	//	public double normalizedTf(WikiSearch search, String url){
+	//		return search.getRelevance(url)/getDocEuclideanNorm(url);
+	//	}
+	//
+	//	private double getDocEuclideanNorm(String url){
+	//		List<Integer> documentVector = this.getDocumentVector(url);
+	//		double euclideanNorm = 0;
+	//		for(Integer freq : documentVector){
+	//			euclideanNorm += freq*freq;
+	//		}
+	//		return Math.sqrt(euclideanNorm);
+	//	}
+	//
+	//	private List<Integer> getDocumentVector(String url){
+	//		List<Integer> documentVector = new ArrayList<>();
+	//		for(String term : indexer.keySet()){
+	//			for(TermCounter tc : indexer.get(term)){
+	//				if(tc.getLabel().equals(url)){
+	//					documentVector.add(tc.get(term));
+	//				}
+	//			}
+	//		}
+	//		return documentVector;
+	//	}
 
-	private List<Integer> getDocumentVector(String url){
-		List<Integer> documentVector = new ArrayList<>();
-		for(String term : indexer.keySet()){
-			for(TermCounter tc : indexer.get(term)){
-				if(tc.getLabel().equals(url)){
-					documentVector.add(tc.get(term));
-				}
-			}
+	private void createDocuments(List<Entry<String, Integer>> counts){
+		for(Entry<String, Integer> entry : counts){
+			documents.add(new Document(entry.getKey()));
 		}
-		return documentVector;
-	}
-	
-	private Document getDocument(String url){
-		for(Document doc : documents){
-			if(doc.getUrl().equals(url)){
-				return doc;
-			}
-		}
-		return null;
 	}
 
 	public List<Document> getDocuments() {

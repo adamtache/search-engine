@@ -9,13 +9,13 @@ import org.jsoup.select.Elements;
 import fetcher.WikiFetcher;
 import org.jsoup.nodes.Element;
 
-public class WikiCrawler extends Crawler{
+public class WikiCrawler {
 
 	final static WikiFetcher wf = new WikiFetcher();
 	
 	public List<String> getCrawled() throws IOException{
 		String random = this.getRandomURL();
-		String start = random.substring(random.indexOf("/wiki/"));
+		String start = getRandomStart();
 		random = this.getRandomURL();
 		String goal = random.substring(random.indexOf("/wiki/"));
 		return this.getCrawled(start, goal);
@@ -123,8 +123,13 @@ public class WikiCrawler extends Crawler{
 	 * 
 	 * @return String, random page URL
 	 */
-	private String getRandomURL(){
+	public String getRandomURL(){
 		return "https://en.wikipedia.org/wiki/Special:Random";
+	}
+	
+	public String getRandomStart(){
+		String random = this.getRandomURL();
+		return random.substring(random.indexOf("/wiki/"));
 	}
 
 }

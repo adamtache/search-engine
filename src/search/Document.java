@@ -14,7 +14,7 @@ public class Document {
 		this.termTfids = new HashMap<>();
 	}
 	
-	public void add(String term, double tfidf){
+	public void addTerm(String term, double tfidf){
 		this.termTfids.put(term, tfidf);
 	}
 	

@@ -1,23 +1,25 @@
 package crawler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-
 import fetcher.WikiFetcher;
-
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
-public class WikiCrawler extends Crawler{
+public class WikiCrawler {
 
 	final static WikiFetcher wf = new WikiFetcher();
+	
+	public List<String> getCrawled() throws IOException{
+		String random = this.getRandomURL();
+		String start = getRandomStart();
+		random = this.getRandomURL();
+		String goal = random.substring(random.indexOf("/wiki/"));
+		return this.getCrawled(start, goal);
+	}
 
 	/**
 	 * Gets list of crawled Wikipedia pages from a starting page to a goal page.
@@ -25,10 +27,8 @@ public class WikiCrawler extends Crawler{
 	 *
 	 * @throws IOException
 	 */
-	public List<String> getCrawled() throws IOException{
-		String goal = this.getGoalURL();
+	public List<String> getCrawled(String url, String goal) throws IOException{
 		List<String> crawled = new ArrayList<>();
-		String url = this.getStartURL();
 		crawled.add(url);
 		boolean foundLink = false;
 		boolean end = false;
@@ -119,82 +119,17 @@ public class WikiCrawler extends Crawler{
 	}
 
 	/**
-	 * Gets starting URL for crawl. 
-	 * First asks user if he/she wants to start at a random article using Wikipedia's random page feature.
-	 * Then asks if he/she wants to start at the Java programming language page.
-	 * If not, then user has ability to enter a custom URL.
-	 *
-	 * @throws IOException
-	 */
-	private String getStartURL() throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Want to start at a random article? Yes or no.");
-		String random = br.readLine().toLowerCase();
-		String url;
-		if(random.contains("y")){
-			url = Jsoup.connect(getRandomURL()).get().location();
-		}
-		else{
-			System.out.println("Want to start at the Java (Programming language) page?");
-			random = br.readLine().toLowerCase();
-			if(random.contains("y")){
-				url = Jsoup.connect(getJavaURL()).get().location();
-			}
-			else{
-				System.out.println("Please enter a Wikipedia URL.");
-				url = br.readLine();
-			}
-		}
-		return url.substring(url.indexOf("/wiki/"));
-	}
-
-	/**
-	 * Gets goal URL for crawl. 
-	 * First asks user if he/she wants to crawl for the Philosophy article.
-	 * If not, user can enter a custom URL.
-	 *
-	 * @throws IOException
-	 */
-	private String getGoalURL() throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Welcome to a Wikipedia crawler.\nWant to crawl for the Philosophy article? Yes or no.");
-		String random = br.readLine().toLowerCase();
-		String url;
-		if(random.contains("y")){
-			url = Jsoup.connect(getPhilosophyURL()).get().location();
-		}
-		else{
-			System.out.println("Please enter a Wikipedia URL.");
-			url = br.readLine();
-		}
-		return url.substring(url.indexOf("/wiki/"));
-	}
-	
-	/**
-	 * Gets philosophy Wikipedia page URL.
-	 * 
-	 * @return String, philosophy page URL
-	 */
-	private String getPhilosophyURL(){
-		return "https://en.wikipedia.org/wiki/Philosophy";
-	}
-
-	/**
 	 * Gets random Wikipedia page URL.
 	 * 
 	 * @return String, random page URL
 	 */
-	private String getRandomURL(){
+	public String getRandomURL(){
 		return "https://en.wikipedia.org/wiki/Special:Random";
 	}
-
-	/**
-	 * Gets Java programming language Wikipedia page URL.
-	 * 
-	 * @return String, Java programming language page URL
-	 */
-	private String getJavaURL(){
-		return "https://en.wikipedia.org/wiki/Java_(programming_language)";
+	
+	public String getRandomStart(){
+		String random = this.getRandomURL();
+		return random.substring(random.indexOf("/wiki/"));
 	}
 
 }

@@ -1,8 +1,6 @@
 package view;
 
-import java.io.IOException;
 
-import controller.SearchController;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -18,21 +16,14 @@ public class SearchPane {
 	private static final int LEFT_PADDING = 50;
 	private static final int SPACING = 30;
 	private StackPane myStackPane;
-	private String mySearchTerm;
 	private TextField mySearchBar;
 	private Button mySearchButton;
-	private SearchController mySearchController;
 	
 	public SearchPane(){
 		initTopPane();
 	}
 	private void initTopPane(){
 		myStackPane = new StackPane();
-		try{
-			mySearchController = new SearchController();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
 		HBox hbox = new HBox(SPACING);
 		hbox.setPadding(new Insets(TOP_PADDING,RIGHT_PADDING,BOTTOM_PADDING,LEFT_PADDING));
 		createSearchBar(hbox);
@@ -53,7 +44,6 @@ public class SearchPane {
 		container.getChildren().add(mySearchButton);
 		mySearchButton.setOnAction(e -> {
 		try {  
-			mySearchController.search(getSearchTerm());
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}});
@@ -63,7 +53,4 @@ public class SearchPane {
 		return myStackPane;
 	}
 	
-	private String getSearchTerm(){
-		return mySearchTerm;
-	}
 }

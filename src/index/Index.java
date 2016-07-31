@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
 
 import org.jsoup.select.Elements;
 
@@ -21,6 +20,8 @@ public abstract class Index {
 
 	private Map<String, Set<TermCounter>> index = new HashMap<String, Set<TermCounter>>();
 	private Set<String> indexed = new HashSet<>();
+	
+	public abstract Fetcher getFetcher();
 	
 	/**
 	 * Adds a TermCounter to the set associated with `term`.
@@ -99,7 +100,5 @@ public abstract class Index {
 	public Set<String> keySet() {
 		return index.keySet();
 	}
-	
-	public abstract Fetcher getFetcher();
 
 }

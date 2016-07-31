@@ -17,8 +17,6 @@ public abstract class Fetcher {
 		this.minInterval = minInterval;
 	}
 	
-	public abstract Elements read(String url) throws IOException;
-	
 	public abstract Elements fetch(String url) throws IOException;
 
 	/**

@@ -3,13 +3,13 @@ package controller;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import search.Searcher;
+import view.IView;
 import view.View;
 
-public class Main extends Application{
+public class Main extends Application {
 	
-	private View view;
-	private Searcher sc;
+	private IView view;
+	private IController controller;
 	
 	public static void main(String[] args) throws IOException{
 		launch(args);
@@ -17,8 +17,9 @@ public class Main extends Application{
 	
 	@Override
 	public void start(Stage stage) throws Exception {
-		sc = new Searcher();
-		view = new View(sc);
+		controller = new Controller();
+		view = new View(controller);
+		controller.setView(view);
 		view.initialize(stage);
 	}
 	

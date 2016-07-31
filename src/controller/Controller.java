@@ -1,7 +1,10 @@
 package controller;
 
 import java.io.IOException;
-import search.ISearchResult;
+import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import search.ISearcher;
 import search.Searcher;
 import view.IView;
@@ -26,7 +29,7 @@ public class Controller implements IController {
 
 	@Override
 	public void display() {
-		view.display(searcher.getResults(view.getSearchTerm()));
+		view.display();
 	}
 	
 	@Override
@@ -35,14 +38,25 @@ public class Controller implements IController {
 	}
 
 	@Override
-	public ISearchResult getResults() {
+	public PriorityQueue<Entry<String, Double>> getResults() {
 		return searcher.getResults(view.getSearchTerm());
 	}
 
 	@Override
 	public String getResultUrl(int result) {
-		ISearchResult search_result = getResults();
-		return search_result.getUrl(result);
+		PriorityQueue<Entry<String, Double>> search_result = getResults();
+		if(search_result.size() == 0){
+			return "http://www.google.com";
+		}
+		List<Entry<String, Double>> temp = new ArrayList<>();
+		for(int x=0; x<result; x++){
+			temp.add(search_result.poll());
+		}
+		Entry<String, Double> resultEntry = search_result.poll();
+		temp.add(resultEntry);
+		String resultUrl = resultEntry.getKey();
+		search_result.addAll(temp);
+		return resultUrl;
 	}
 
 }

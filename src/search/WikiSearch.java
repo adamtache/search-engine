@@ -1,6 +1,5 @@
 package search;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import index.IIndex;
-import index.JedisIndex;
-import index.JedisMaker;
-import redis.clients.jedis.Jedis;
 
 
 /**
@@ -23,7 +18,6 @@ public class WikiSearch implements ISearchResult {
 
 	// map from URLs that contain the term(s) to relevance score
 	private Map<String, Integer> counts; // URL -> term count
-	private Map<String, Double> tfIdfs; // URL -> TF-IDF value
 
 	/**
 	 * Constructor.
@@ -126,42 +120,20 @@ public class WikiSearch implements ISearchResult {
 	 * 
 	 * @return List of entries with URL and relevance.
 	 */
+	
 	public List<Entry<String, Integer>> sort() {
 		List<Entry<String, Integer>> entries = new ArrayList<>(counts.entrySet());
 		Comparator<Entry<String, Integer>> comparator = new RelevanceComparator();
 		Collections.sort(entries, comparator);
 		return entries;
 	}
-
-	public static void main(String[] args) throws IOException {
-
-		// make a IIndex
-		Jedis jedis = JedisMaker.make();
-		IIndex index = new JedisIndex(jedis);
-
-		// search for the first term
-		String term1 = "java";
-		System.out.println("Query: " + term1);
-		ISearchResult search1 = SearchResultFactory.search(term1, index);
-		search1.print();
-
-		// search for the second term
-		String term2 = "programming";
-		System.out.println("Query: " + term2);
-		ISearchResult search2 = SearchResultFactory.search(term2, index);
-		search2.print();
-
-		// compute the intersection of the searches
-		System.out.println("Query: " + term1 + " AND " + term2);
-		ISearchResult intersection = search1.and(search2);
-		if(intersection != null)
-			intersection.print();
-	}
+	
 	
 	public int getNumUrls(){
 		return this.counts.keySet().size();
 	}
 
+	
 	public int getNumUrlsWithTerm(String term) {
 		int count = 0;
 		for(String url : counts.keySet()){
@@ -172,56 +144,19 @@ public class WikiSearch implements ISearchResult {
 		return count;
 	}
 
-	@Override
+	
 	public String getUrl(int result) {
 		return this.sort().get(result).getKey();
 	}
 	
-	@Override
+	
 	public Map<String, Integer> getCounts(){
 		return this.counts;
 	}
 	
-//	public double normalizedTfIdf(String term, String url, WikiSearch search){
-	//	return this.normalizedTf(search, url) * this.idf(search, term);
-	//}
-
-	//	public double normalizedTf(WikiSearch search, String url){
-	//		return search.getRelevance(url)/getDocEuclideanNorm(url);
-	//	}
-	//
-	//	private double getDocEuclideanNorm(String url){
-	//		List<Integer> documentVector = this.getDocumentVector(url);
-	//		double euclideanNorm = 0;
-	//		for(Integer freq : documentVector){
-	//			euclideanNorm += freq*freq;
-	//		}
-	//		return Math.sqrt(euclideanNorm);
-	//	}
-	//
-	//	private List<Integer> getDocumentVector(String url){
-	//		List<Integer> documentVector = new ArrayList<>();
-	//		for(String term : indexer.keySet()){
-	//			for(TermCounter tc : indexer.get(term)){
-	//				if(tc.getLabel().equals(url)){
-	//					documentVector.add(tc.get(term));
-	//				}
-	//			}
-	//		}
-	//		return documentVector;
-	//	}
 	
-	@Override
-	public double tfIdf(String url, String term){
-		return getRelevance(url) * this.idf(term);
-	}
-	
-	@Override
-	public double idf(String term){
-		int numDocuments = getNumUrls();
-		int documentFrequency = 0;
-		getNumUrlsWithTerm(term);
-		return Math.log((double) numDocuments/documentFrequency);
+	public Integer tf(String url){
+		return this.counts.get(url);
 	}
 	
 }

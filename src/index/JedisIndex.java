@@ -1,7 +1,10 @@
 package index;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +16,7 @@ import fetcher.Fetcher;
 import fetcher.WikiFetcher;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
+import search.ResultsComparator;
 
 /**
  * Represents a Redis-backed web search index.
@@ -32,7 +36,7 @@ public class JedisIndex implements IIndex {
 		this.jedis = jedis;
 		this.wf = new WikiFetcher();
 	}
-	
+
 	/**
 	 * Returns the Redis key for a given search term.
 	 * 
@@ -41,7 +45,7 @@ public class JedisIndex implements IIndex {
 	private String urlSetKey(String term) {
 		return "URLSet:" + term;
 	}
-	
+
 	/**
 	 * Returns the Redis key for a URL's TermCounter.
 	 * 
@@ -61,7 +65,7 @@ public class JedisIndex implements IIndex {
 		String redisKey = termCounterKey(url);
 		return jedis.exists(redisKey);
 	}
-	
+
 	/**
 	 * Adds a URL to the set associated with `term`.
 	 * 
@@ -89,7 +93,7 @@ public class JedisIndex implements IIndex {
 	 * @param term
 	 * @return Map from URL to count.
 	 */
-	public Map<String, Integer> getCounts(String term) {
+	public Map<String, Integer> getCountsSlower(String term) {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		Set<String> urls = getURLs(term);
 		for (String url: urls) {
@@ -105,7 +109,7 @@ public class JedisIndex implements IIndex {
 	 * @param term
 	 * @return Map from URL to count.
 	 */
-	public Map<String, Integer> getCountsFaster(String term) {
+	public Map<String, Integer> getCounts(String term) {
 		// convert the set of strings to a list so we get the
 		// same traversal order every time
 		List<String> urls = new ArrayList<String>();
@@ -151,11 +155,11 @@ public class JedisIndex implements IIndex {
 	 */
 	public void indexPage(String url, Elements paragraphs) {
 		System.out.println("Indexing " + url);
-		
+
 		// make a TermCounter and count the terms in the paragraphs
 		TermCounter tc = new TermCounter(url);
 		tc.processElements(paragraphs);
-		
+
 		// push the contents of the TermCounter to Redis
 		pushTermCounterToRedis(tc);
 	}
@@ -168,10 +172,10 @@ public class JedisIndex implements IIndex {
 	 */
 	public List<Object> pushTermCounterToRedis(TermCounter tc) {
 		Transaction t = jedis.multi();
-		
+
 		String url = tc.getLabel();
 		String hashname = termCounterKey(url);
-		
+
 		// if this page has already been indexed; delete the old hash
 		t.del(hashname);
 
@@ -195,7 +199,7 @@ public class JedisIndex implements IIndex {
 		// loop through the search terms
 		for (String term: termSet()) {
 			System.out.println(term);
-			
+
 			// for each term, print the pages where it appears
 			Set<String> urls = getURLs(term);
 			for (String url: urls) {
@@ -296,8 +300,78 @@ public class JedisIndex implements IIndex {
 		t.exec();
 	}
 
+	@Override
 	public Fetcher getFetcher() {
 		return wf;
 	}
+
+	@Override
+	public PriorityQueue<Entry<String, Double>> getTfIds(String term) {
+		int numURLs = getURLs(term).size();
+		if(numURLs == 0){
+			return new PriorityQueue<Entry<String, Double>>();
+		}
+		PriorityQueue<Entry<String, Double>> results = new PriorityQueue<Entry<String, Double>>(numURLs, new ResultsComparator());
+		for(String url : getURLs(term)){
+			Entry<String, Double> result = new AbstractMap.SimpleEntry<String, Double>(url, tfIdf(url, term));
+			results.add(result);
+		}
+		return results;
+	}
 	
+	@Override
+	public int getNumUrls(){
+		Set<String> uniqueUrls = new HashSet<>();
+		for (String term: termSet()) {
+			uniqueUrls.addAll(getURLs(term));
+		}
+		return uniqueUrls.size();
+	}
+
+
+	@Override
+	public Double tfIdf(String url, String term){
+		double tf = getCount(url, term);
+		System.out.println("Term Frequency: " + tf);
+		return tf * this.idf(term);
+	}
+
+	@Override
+	public Double idf(String term){
+		int numDocuments = getNumUrls();
+		int documentFrequency = getURLs(term).size();
+		System.out.println("Num Documents: " + numDocuments);
+		System.out.println("Document Frequency: " + documentFrequency);
+		return Math.log((double) numDocuments/documentFrequency);
+	}
+
+	//	public double normalizedTfIdf(String term, String url, WikiSearch search){
+	//	return this.normalizedTf(search, url) * this.idf(search, term);
+	//}
+
+	//	public double normalizedTf(WikiSearch search, String url){
+	//		return search.getRelevance(url)/getDocEuclideanNorm(url);
+	//	}
+	//
+	//	private double getDocEuclideanNorm(String url){
+	//		List<Integer> documentVector = this.getDocumentVector(url);
+	//		double euclideanNorm = 0;
+	//		for(Integer freq : documentVector){
+	//			euclideanNorm += freq*freq;
+	//		}
+	//		return Math.sqrt(euclideanNorm);
+	//	}
+	//
+	//	private List<Integer> getDocumentVector(String url){
+	//		List<Integer> documentVector = new ArrayList<>();
+	//		for(String term : indexer.keySet()){
+	//			for(TermCounter tc : indexer.get(term)){
+	//				if(tc.getLabel().equals(url)){
+	//					documentVector.add(tc.get(term));
+	//				}
+	//			}
+	//		}
+	//		return documentVector;
+	//	}
+
 }

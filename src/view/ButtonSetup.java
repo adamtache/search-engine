@@ -21,6 +21,7 @@ public class ButtonSetup {
 			@Override
 			public void handle(ActionEvent event) {
 				controller.search(term);
+				controller.display();
 				controller.go_to(0);
 			}
 		};

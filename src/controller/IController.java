@@ -1,6 +1,7 @@
 package controller;
 
-import search.ISearchResult;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import view.IView;
 
 public interface IController {
@@ -11,7 +12,7 @@ public interface IController {
 	
 	public abstract void go_to(int page);
 
-	public abstract ISearchResult getResults();
+	public abstract PriorityQueue<Entry<String, Double>> getResults();
 
 	public abstract String getResultUrl(int result);
 

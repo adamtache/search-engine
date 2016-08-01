@@ -1,8 +1,5 @@
 package view;
 
-import java.util.List;
-import java.util.Map.Entry;
-
 import controller.IController;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -34,9 +31,9 @@ public class MainScreen implements IScreen {
 		myRoot = new BorderPane();
 		myStatusBar = new StatusBar();
 		mySearchBar = new SearchBar(myController, this);
-		myLuckyResult = new LuckyResult(myController, myResultPane);
-		mySearchResult = new SearchResult();
 		myResultPane = new StackPane();
+		myLuckyResult = new LuckyResult(myController, myResultPane);
+		mySearchResult = new SearchResult(myResultPane);
 		myResultPane.getChildren().add(mySearchResult.getNode());
 		setBorderPaneSections();
 		myScene = new Scene(myRoot, myWidth, myHeight);
@@ -48,12 +45,7 @@ public class MainScreen implements IScreen {
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
-		    	myResultPane.getChildren().clear();
-				myResultPane.getChildren().add(mySearchResult.getNode());
-				List<Entry<String,Double>> dataEntries = data.getEntries();
-				for(Entry<String,Double> dataEntry: dataEntries){
-					mySearchResult.addResult(dataEntry.getKey());
-				}
+				mySearchResult.display(data.getEntries());				
 		    }
 		});
 	}

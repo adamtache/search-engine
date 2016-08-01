@@ -20,7 +20,6 @@ public class MainScreen implements IScreen {
 	private LuckyResult myLuckyResult;
 	private StackPane myResultPane;
 	private SearchResult mySearchResult;
-	private Thread myOutputThread;
 	private StatusBar myStatusBar;
 	
 	public MainScreen(IController controller, int windowWidth, int windowHeight) {
@@ -48,7 +47,7 @@ public class MainScreen implements IScreen {
 
 	private void initialize() {
 		myRoot = new BorderPane();
-		setUpStatusBar();
+		myStatusBar = new StatusBar();
 		mySearchBar = new SearchBar(myController, this);
 		myLuckyResult = new LuckyResult(myController, myResultPane);
 		mySearchResult = new SearchResult();
@@ -64,17 +63,8 @@ public class MainScreen implements IScreen {
 		myRoot.setCenter(myResultPane);
 	}
 	
-	private void setUpStatusBar(){
-		myStatusBar = new StatusBar();
-		myOutputThread = new Thread(myStatusBar);
-		myOutputThread.setPriority(Thread.MAX_PRIORITY);
-		myOutputThread.start();
-	}
-	
 	public void updateStatus(String status){
 		myStatusBar.updateStatus(status);
-		System.out.println(status);
-		myOutputThread.run();
 	}
 
 	public Scene getScene() {

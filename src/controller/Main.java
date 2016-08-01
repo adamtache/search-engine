@@ -2,14 +2,13 @@ package controller;
 
 import java.io.IOException;
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import view.IView;
 import view.View;
 
 public class Main extends Application {
 	
-	private static final int SCREEN_WIDTH = 1300;
+	private static final int SCREEN_WIDTH = 800;
 	private static final int SCREEN_HEIGHT = 800;	
 	private Stage s;
 	IView view;

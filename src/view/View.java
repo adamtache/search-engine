@@ -50,4 +50,5 @@ public class View implements IView {
 	public void updateStatus(String status){
 		myMainScreen.updateStatus(status);
 	}
+
 }

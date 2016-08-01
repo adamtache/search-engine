@@ -8,7 +8,7 @@ import view.View;
 
 public class Main extends Application {
 	
-	private static final int SCREEN_WIDTH = 1300;
+	private static final int SCREEN_WIDTH = 800;
 	private static final int SCREEN_HEIGHT = 800;	
 	private Stage s;
 	IView view;

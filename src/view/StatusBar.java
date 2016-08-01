@@ -5,9 +5,9 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
-public class StatusBar implements Runnable{
+public class StatusBar{
 	
-	private String myStatus;
+	private static final int WINDOW_WIDTH = 800;
 	private TextArea myStatusOutput;
 	private ScrollPane myStatusPane;
 	
@@ -16,21 +16,15 @@ public class StatusBar implements Runnable{
 	}
 	
 	private void initialize(){
-		this.myStatus = "Awaiting user input.";
 		myStatusPane = new ScrollPane();
-		myStatusOutput = new TextArea();
-		myStatusOutput.setPrefWidth(1300);
-		myStatusOutput.setPrefHeight(100);
+		myStatusOutput = new TextArea("Awaiting user input.\n");
+		myStatusOutput.setPrefWidth(WINDOW_WIDTH);
+		myStatusOutput.setPrefHeight(150);
 		myStatusPane.setContent(myStatusOutput);
 	}
 	
-	@Override
-	public void run() {
-		myStatusOutput.appendText(myStatus + "\n");
-	}
-	
 	public void updateStatus(String status){
-		this.myStatus = status;
+		myStatusOutput.appendText(status + "\n");
 	}
 	
 	public Node getNode(){

@@ -30,6 +30,7 @@ public class Controller implements IController {
 	
 	@Override
 	public void goTo(int page){
+		myView.updateStatus("Controller telling view to display page.");
 		myView.display(page);
 	}
 

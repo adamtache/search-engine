@@ -73,7 +73,10 @@ public class SearchBar {
 			}
 		}); 
 		new Thread(task).start();
-		task.setOnSucceeded(event -> myMainScreen.updateStatus("Finished displaying. Done."));
+		task.setOnSucceeded(event -> {
+			myMainScreen.updateStatus("Finished displaying. Done.");
+			myRoot.getChildren().remove(bar);
+		});
 	}
 
 	private void setupFeelingLuckyButton(Button feelingLuckyButton) {

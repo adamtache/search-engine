@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import controller.IController;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -28,23 +29,7 @@ public class MainScreen implements IScreen {
 		this.myHeight = windowHeight;
 		initialize();
 	}
-
-	@Override
-	public void display(ISearchData data) {
-		updateStatus("MainScreen printing data");
-		myResultPane.getChildren().clear();
-		myResultPane.getChildren().add(mySearchResult.getNode());
-		List<Entry<String,Double>> dataEntries = data.getEntries();
-		for(Entry<String,Double> dataEntry: dataEntries){
-			mySearchResult.addResult(dataEntry.getKey());
-		}
-	}
-
-	@Override
-	public void display(int result) {
-		myLuckyResult.display(result);
-	}
-
+	
 	private void initialize() {
 		myRoot = new BorderPane();
 		myStatusBar = new StatusBar();
@@ -55,6 +40,27 @@ public class MainScreen implements IScreen {
 		myResultPane.getChildren().add(mySearchResult.getNode());
 		setBorderPaneSections();
 		myScene = new Scene(myRoot, myWidth, myHeight);
+	}
+
+	@Override
+	public void display(ISearchData data) {
+		updateStatus("MainScreen printing data");
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	myResultPane.getChildren().clear();
+				myResultPane.getChildren().add(mySearchResult.getNode());
+				List<Entry<String,Double>> dataEntries = data.getEntries();
+				for(Entry<String,Double> dataEntry: dataEntries){
+					mySearchResult.addResult(dataEntry.getKey());
+				}
+		    }
+		});
+	}
+
+	@Override
+	public void display(int result) {
+		myLuckyResult.display(result);
 	}
 	
 	private void setBorderPaneSections(){

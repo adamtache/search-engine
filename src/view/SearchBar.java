@@ -15,10 +15,11 @@ public class SearchBar {
 	private Button feelingLuckyButton;
 	private IController myController;
 	private HBox myRoot;
-//	private MainScreen myMainScreen;
+	private MainScreen myMainScreen;
 	
-	public SearchBar(IController controller){
+	public SearchBar(IController controller, MainScreen mainScreen){
 		this.myController = controller;
+		this.myMainScreen = mainScreen;
 		initialize();
 	}
 	
@@ -39,11 +40,11 @@ public class SearchBar {
 	private void setupSearchButton(Button searchButton) {
 		this.searchButton = new Button("Search");
 		this.searchButton.setOnAction(event -> {
-			System.out.println("Search button pressed.");
+			myMainScreen.updateStatus("Search button pressed.");
 			myController.search(getSearchTerm());
-			System.out.println("Finished search.");
+			myMainScreen.updateStatus("Finished search.");
 			myController.display();
-			System.out.println("Finished displaying. Done.");
+			myMainScreen.updateStatus("Finished displaying. Done.");
 		});
 	}
 

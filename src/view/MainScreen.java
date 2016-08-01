@@ -5,10 +5,8 @@ import java.util.Map.Entry;
 
 import controller.IController;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import search.ISearchData;
 
 public class MainScreen implements IScreen {
@@ -21,8 +19,9 @@ public class MainScreen implements IScreen {
 	private Scene myScene;
 	private LuckyResult myLuckyResult;
 	private StackPane myResultPane;
-	private VBox myStatusPane;
 	private SearchResult mySearchResult;
+	private Thread myOutputThread;
+	private StatusBar myStatusBar;
 	
 	public MainScreen(IController controller, int windowWidth, int windowHeight) {
 		this.myController = controller;
@@ -49,27 +48,32 @@ public class MainScreen implements IScreen {
 
 	private void initialize() {
 		myRoot = new BorderPane();
-		myResultPane = new StackPane();
-		createStatusPane();
-		mySearchBar = new SearchBar(myController);
+		setUpStatusBar();
+		mySearchBar = new SearchBar(myController, this);
 		myLuckyResult = new LuckyResult(myController, myResultPane);
 		mySearchResult = new SearchResult();
-		myRoot.setTop(mySearchBar.getNode());
+		myResultPane = new StackPane();
 		myResultPane.getChildren().add(mySearchResult.getNode());
-		myRoot.setCenter(myResultPane);
-		myRoot.setBottom(myStatusPane);
+		setBorderPaneSections();
 		myScene = new Scene(myRoot, myWidth, myHeight);
 	}
 	
-	private void createStatusPane(){
-		myStatusPane = new VBox();
-		Label myStatus = new Label("Awaiting user input.");
-		myStatusPane.getChildren().add(myStatus);
-		//TODO : make a scrollpane
+	private void setBorderPaneSections(){
+		myRoot.setTop(mySearchBar.getNode());
+		myRoot.setBottom(myStatusBar.getNode());
+		myRoot.setCenter(myResultPane);
+	}
+	
+	private void setUpStatusBar(){
+		myStatusBar = new StatusBar();
+		myOutputThread = new Thread(myStatusBar);
+		myOutputThread.setPriority(Thread.MAX_PRIORITY);
+		myOutputThread.start();
 	}
 	
 	public void updateStatus(String status){
-		myStatusPane.getChildren().add(new Label(status));
+		myStatusBar.updateStatus(status);
+		myOutputThread.run();
 	}
 
 	public Scene getScene() {

@@ -73,6 +73,7 @@ public class MainScreen implements IScreen {
 	
 	public void updateStatus(String status){
 		myStatusBar.updateStatus(status);
+		System.out.println(status);
 		myOutputThread.run();
 	}
 

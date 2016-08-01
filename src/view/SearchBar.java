@@ -1,11 +1,15 @@
 package view;
 
 import controller.IController;
+import javafx.animation.PauseTransition;
+import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 public class SearchBar {
 	
@@ -41,11 +45,26 @@ public class SearchBar {
 		this.searchButton = new Button("Search");
 		this.searchButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Search button pressed.");
-			myController.search(getSearchTerm());
+			runSearch();
+//			myController.search(getSearchTerm());
 			myMainScreen.updateStatus("Finished search.");
-			myController.display();
-			myMainScreen.updateStatus("Finished displaying. Done.");
+//			myController.display();
+//			myMainScreen.updateStatus("Finished displaying. Done.");
 		});
+	}
+	
+	private void runSearch(){
+		Task<Void> task = new Task<Void>() {
+			@Override 
+			public Void call() {
+				myController.search(getSearchTerm());
+				return null;
+			}
+		};
+		ProgressBar bar = new ProgressBar();
+		bar.progressProperty().bind(task.progressProperty());
+		myRoot.getChildren().add(bar);
+		new Thread(task).start();
 	}
 
 	private void setupFeelingLuckyButton(Button feelingLuckyButton) {

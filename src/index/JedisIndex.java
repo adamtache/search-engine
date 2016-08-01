@@ -17,6 +17,7 @@ import fetcher.WikiFetcher;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 import search.ResultsComparator;
+import view.IView;
 
 /**
  * Represents a Redis-backed web search index.
@@ -26,15 +27,17 @@ public class JedisIndex implements IIndex {
 
 	private Jedis jedis;
 	private WikiFetcher wf;
+	private IView myView;
 
 	/**
 	 * Constructor.
 	 * 
 	 * @param jedis
 	 */
-	public JedisIndex(Jedis jedis) {
+	public JedisIndex(Jedis jedis, IView view) {
 		this.jedis = jedis;
 		this.wf = new WikiFetcher();
+		this.myView = view;
 	}
 
 	/**
@@ -154,7 +157,7 @@ public class JedisIndex implements IIndex {
 	 * @param paragraphs  Collection of elements that should be indexed.
 	 */
 	public void indexPage(String url, Elements paragraphs) {
-		System.out.println("Indexing " + url);
+		myView.updateStatus("Indexing " + url);
 
 		// make a TermCounter and count the terms in the paragraphs
 		TermCounter tc = new TermCounter(url);
@@ -308,17 +311,17 @@ public class JedisIndex implements IIndex {
 	@Override
 	public PriorityQueue<Entry<String, Double>> getTfIds(String term) {
 		int numURLs = getURLs(term).size();
-		System.out.println("Number URLs for term: " + numURLs);
+		myView.updateStatus("Number URLs for term: " + numURLs);
 		if(numURLs == 0){
 			return new PriorityQueue<Entry<String, Double>>();
 		}
 		PriorityQueue<Entry<String, Double>> results = new PriorityQueue<Entry<String, Double>>(numURLs, new ResultsComparator());
-		System.out.println("URLS: ~~~~~~~~~~~~~~~~~~~~~~ " + getURLs(term));
+		myView.updateStatus("URLS: ~~~~~~~~~~~~~~~~~~~~~~ " + getURLs(term));
 		for(String url : getURLs(term)){
-			System.out.println("Calculating TFIDF for " + term+" for URL: " + url);
+			myView.updateStatus("Calculating TFIDF for " + term+" for URL: " + url);
 			double tfIdf = this.tfIdf(url, term);
 			Entry<String, Double> result = new AbstractMap.SimpleEntry<String, Double>(url, tfIdf);
-			System.out.println("TFIDF Calculation done.");
+			myView.updateStatus("TFIDF Calculation done.");
 			results.add(result);
 		}
 		return results;
@@ -337,17 +340,17 @@ public class JedisIndex implements IIndex {
 	@Override
 	public Double tfIdf(String url, String term){
 		double tf = getCount(url, term);
-		System.out.println("Index determined TF to be: "+tf+".");
+		myView.updateStatus("Index determined TF to be: "+tf+".");
 		return tf * this.idf(term);
 	}
 
 	@Override
 	public Double idf(String term){
-		System.out.println("Index determing IDF.");
+		myView.updateStatus("Index determing IDF.");
 		int numDocuments = getNumUrls();
-		System.out.println("Num Documents: " + numDocuments);
+		myView.updateStatus("Num Documents: " + numDocuments);
 		int documentFrequency = getURLs(term).size();
-		System.out.println("Document Frequency: " + documentFrequency);
+		myView.updateStatus("Document Frequency: " + documentFrequency);
 		return Math.log((double) numDocuments/documentFrequency);
 	}
 

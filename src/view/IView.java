@@ -1,15 +1,17 @@
 package view;
 
-import javafx.stage.Stage;
+import javafx.scene.Scene;
 
 public interface IView {
 	
 	public abstract void display(int page);
-
-	public abstract void initialize(Stage stage);
 	
 	public abstract String getSearchTerm();
 	
 	public void display();
+
+	public abstract Scene getScene();
+	
+	public void updateStatus(String status);
 	
 }

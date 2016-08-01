@@ -8,38 +8,35 @@ import view.IView;
 
 public class Controller implements IController {
 	
-	private ISearcher searcher;
-	private IView view;
+	private ISearcher mySearcher;
+	private IView myView;
 	
-	public Controller() throws IOException {
-		searcher = new Searcher();
-	}
-	
-	public void setView(IView view){
-		this.view = view;
+	public Controller(IView view) throws IOException {
+		this.myView = view;
+		this.mySearcher = new Searcher(view);
 	}
 
 	@Override
 	public void search(String term) {
-		System.out.println("Controller telling searcher to search.");
-		searcher.search(term);
+		myView.updateStatus("Controller telling searcher to search.");
+		mySearcher.search(term);
 	}
 
 	@Override
 	public void display() {
-		System.out.println("Controller telling view to display data.");
-		view.display();
+		myView.updateStatus("Controller telling view to display data.");
+		myView.display();
 	}
 	
 	@Override
-	public void go_to(int page){
-		view.display(page);
+	public void goTo(int page){
+		myView.display(page);
 	}
 
 	@Override
 	public ISearchData getResults() {
-		System.out.println("View getting results from searcher to send to MainScreen.");
-		return searcher.getResults(view.getSearchTerm());
+		myView.updateStatus("View getting results from searcher to send to MainScreen.");
+		return mySearcher.getResults(myView.getSearchTerm());
 	}
 
 	@Override

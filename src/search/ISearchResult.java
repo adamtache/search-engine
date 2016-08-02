@@ -8,8 +8,8 @@ public interface ISearchResult {
 
 	public abstract void print(); // For testing purposes.
 
-	public abstract Map<String, Integer> getCounts();
+	public abstract Map<String, Double> getValues();
 
-	public abstract Integer getRelevance(String term);
+	public abstract Double getRelevance(String term);
 	
 }

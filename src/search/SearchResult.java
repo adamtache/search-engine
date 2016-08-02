@@ -14,18 +14,17 @@ import java.util.Set;
  * Represents the results of a search query.
  *
  */
-public class WikiSearch implements ISearchResult {
+public class SearchResult implements ISearchResult {
 
-	// map from URLs that contain the term(s) to relevance score
-	private Map<String, Integer> counts; // URL -> term count
+	private Map<String, Double> values; // URL -> value
 
 	/**
 	 * Constructor.
 	 * 
 	 * @param map2
 	 */
-	public WikiSearch(Map<String, Integer> map2) {
-		this.counts = map2;
+	public SearchResult(Map<String, Double> map2) {
+		this.values = map2;
 	}
 
 	/**
@@ -34,8 +33,8 @@ public class WikiSearch implements ISearchResult {
 	 * @param url
 	 * @return
 	 */
-	public Integer getRelevance(String url) {
-		Integer relevance = counts.get(url);
+	public Double getRelevance(String url) {
+		Double relevance = values.get(url);
 		return relevance==null ? 0: relevance;
 	}
 
@@ -45,11 +44,11 @@ public class WikiSearch implements ISearchResult {
 	 * @param map
 	 */
 	public void print() {
-		List<Entry<String, Integer>> entries = sort();
+		List<Entry<String, Double>> entries = sort();
 		if(entries == null){
 			return;
 		}
-		for (Entry<String, Integer> entry: entries) {
+		for (Entry<String, Double> entry: entries) {
 			System.out.println(entry);
 		}
 	}
@@ -61,12 +60,12 @@ public class WikiSearch implements ISearchResult {
 	 * @return New ISearchResult object.
 	 */
 	public ISearchResult or(ISearchResult that) {
-		Map<String, Integer> orMap = new HashMap<>(counts);
-		Set<String> thatTerms = that.getCounts().keySet();
+		Map<String, Double> orMap = new HashMap<>(values);
+		Set<String> thatTerms = that.getValues().keySet();
 		for(String thatTerm : thatTerms){
 			orMap.put(thatTerm, totalRelevance(that, thatTerm));
 		}
-		return new WikiSearch(orMap);
+		return new SearchResult(orMap);
 	}
 
 	/**
@@ -76,13 +75,13 @@ public class WikiSearch implements ISearchResult {
 	 * @return New ISearchResult object.
 	 */
 	public ISearchResult and(ISearchResult that) {
-		Map<String, Integer> andMap = new HashMap<>();
-		for(String thatTerm : that.getCounts().keySet()){
-			if(this.counts.containsKey(thatTerm)){
+		Map<String, Double> andMap = new HashMap<>();
+		for(String thatTerm : that.getValues().keySet()){
+			if(this.values.containsKey(thatTerm)){
 				andMap.put(thatTerm, totalRelevance(that, thatTerm));
 			}
 		}
-		return new WikiSearch(andMap);
+		return new SearchResult(andMap);
 	}
 
 	/**
@@ -92,14 +91,14 @@ public class WikiSearch implements ISearchResult {
 	 * @return New ISearchResult object.
 	 */
 	public ISearchResult minus(ISearchResult that) {
-		Map<String, Integer> minusMap = new HashMap<>(counts);
-		for(String thatTerm : that.getCounts().keySet()){
+		Map<String, Double> minusMap = new HashMap<>(values);
+		for(String thatTerm : that.getValues().keySet()){
 			minusMap.remove(thatTerm);
 		}
-		return new WikiSearch(minusMap);
+		return new SearchResult(minusMap);
 	}
 
-	private Integer totalRelevance(ISearchResult that, String term){
+	private Double totalRelevance(ISearchResult that, String term){
 		return totalRelevance(that.getRelevance(term), this.getRelevance(term));
 	}
 
@@ -110,7 +109,7 @@ public class WikiSearch implements ISearchResult {
 	 * @param rel2: relevance score for the second search
 	 * @return
 	 */
-	protected Integer totalRelevance(Integer rel1, Integer rel2) {
+	protected Double totalRelevance(Double rel1, Double rel2) {
 		// simple starting place: relevance is the sum of the term frequencies.
 		return rel1 + rel2;
 	}
@@ -121,23 +120,23 @@ public class WikiSearch implements ISearchResult {
 	 * @return List of entries with URL and relevance.
 	 */
 	
-	public List<Entry<String, Integer>> sort() {
-		List<Entry<String, Integer>> entries = new ArrayList<>(counts.entrySet());
-		Comparator<Entry<String, Integer>> comparator = new RelevanceComparator();
+	public List<Entry<String, Double>> sort() {
+		List<Entry<String, Double>> entries = new ArrayList<>(values.entrySet());
+		Comparator<Entry<String, Double>> comparator = new RelevanceComparator();
 		Collections.sort(entries, comparator);
 		return entries;
 	}
 	
 	
-	public int getNumUrls(){
-		return this.counts.keySet().size();
+	public double getNumUrls(){
+		return this.values.keySet().size();
 	}
 
 	
-	public int getNumUrlsWithTerm(String term) {
+	public double getNumUrlsWithTerm(String term) {
 		int count = 0;
-		for(String url : counts.keySet()){
-			if(counts.get(url) > 0){
+		for(String url : values.keySet()){
+			if(values.get(url) > 0){
 				count++;
 			}
 		}
@@ -150,13 +149,13 @@ public class WikiSearch implements ISearchResult {
 	}
 	
 	
-	public Map<String, Integer> getCounts(){
-		return this.counts;
+	public Map<String, Double> getValues(){
+		return this.values;
 	}
 	
 	
-	public Integer tf(String url){
-		return this.counts.get(url);
+	public Double tf(String url){
+		return this.values.get(url);
 	}
 	
 }

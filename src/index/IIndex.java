@@ -19,7 +19,7 @@ public interface IIndex {
 
 	public abstract int getNumUrls();
 
-	public abstract Map<String, Integer> getCounts(String term);
+	public abstract Map<String, Double> getValues(String term);
 
 	public abstract boolean isIndexed(String crawlURL);
 

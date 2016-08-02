@@ -2,20 +2,13 @@ package crawler;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
-
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import fetcher.WikiFetcher;
 import index.IIndex;
 import index.JedisIndex;
-import index.JedisMaker;
-import redis.clients.jedis.Jedis;
 import view.IView;
-import view.View;
 
 
 public class JedisWikiCrawler extends WikiCrawler{

@@ -14,8 +14,8 @@ public class SearchResultFactory {
 	 * @return
 	 */
 	public static ISearchResult search(String term, IIndex index) {
-		Map<String, Integer> map = index.getCounts(term);
-		return new WikiSearch(map);
+		Map<String, Double> map = index.getValues(term);
+		return new SearchResult(map);
 	}
 	
 }

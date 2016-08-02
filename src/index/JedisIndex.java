@@ -367,35 +367,6 @@ public class JedisIndex implements IIndex {
 		this.deleteURLSets();
 		jedis.set(getNumIndexedKey(), new String("0"));
 	}
-
-	//	public double normalizedTfIdf(String term, String url, WikiSearch search){
-	//	return this.normalizedTf(search, url) * this.idf(search, term);
-	//}
-
-	//	public double normalizedTf(WikiSearch search, String url){
-	//		return search.getRelevance(url)/getDocEuclideanNorm(url);
-	//	}
-	//
-	//	private double getDocEuclideanNorm(String url){
-	//		List<Double> documentVector = this.getDocumentVector(url);
-	//		double euclideanNorm = 0;
-	//		for(Double freq : documentVector){
-	//			euclideanNorm += freq*freq;
-	//		}
-	//		return Math.sqrt(euclideanNorm);
-	//	}
-	//
-	//	private List<Double> getDocumentVector(String url){
-	//		List<Double> documentVector = new ArrayList<>();
-	//		for(String term : indexer.keySet()){
-	//			for(TermCounter tc : indexer.get(term)){
-	//				if(tc.getLabel().equals(url)){
-	//					documentVector.add(tc.get(term));
-	//				}
-	//			}
-	//		}
-	//		return documentVector;
-	//	}
 	
 	public IView getView(){
 		return this.myView;

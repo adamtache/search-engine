@@ -4,22 +4,32 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import parser.TokenizedData;
+import search.ISearchResult;
+import search.ResultsFactory;
 
 public class SearchResult {
 
 	private VBox myRoot;
 	private VBox mySearchResults;
 	private StackPane myResultPane;
-	
+	private Button didYouMeanButton;
+	private ISearchResult data;
+
 	public SearchResult(StackPane resultPane){
 		this.myResultPane = resultPane;
 		initialize();
 	}
 	
+	public Node getNode(){
+		return myRoot;
+	}
+
 	private void initialize(){
 		myRoot = new VBox();
 		mySearchResults = new VBox();
@@ -28,21 +38,36 @@ public class SearchResult {
 		myRoot.getChildren().add(mySearchResults);
 	}
 	
-	public Node getNode(){
-		return myRoot;
+	private void setupButton(){
+		TokenizedData tokenizedData = data.getTokenizedData();
+		List<String> spellCorrected = tokenizedData.getSpellCorrected();
+		this.didYouMeanButton = new Button("Did You Mean? " + spellCorrected);
+		this.didYouMeanButton.setOnAction(event -> {
+			this.display(ResultsFactory.getSpellCorrectedResult(tokenizedData));
+		});
+		mySearchResults.getChildren().add(didYouMeanButton);
 	}
-	
-	public void addResult(String resultUrl){
+
+	public void display(ISearchResult data) {
+		this.data = data;
+		myResultPane.getChildren().clear();
+		myResultPane.getChildren().add(myRoot);
+		mySearchResults.getChildren().clear();
+		if(data.checkCorrectedSpelling()){
+			this.addDidYouMean(data.getTokenizedData());
+		}
+		for(Entry<String,Double> dataEntry: data.getResults()){
+			this.addResult(dataEntry.getKey());
+		}
+	}
+
+	private void addResult(String resultUrl){
 		Hyperlink resultLink = new Hyperlink(resultUrl);
 		mySearchResults.getChildren().add(resultLink);
 	}
 
-	public void display(List<Entry<String, Double>> dataEntries) {
-		myResultPane.getChildren().clear();
-		myResultPane.getChildren().add(myRoot);
-		mySearchResults.getChildren().clear();
-		for(Entry<String,Double> dataEntry: dataEntries){
-			addResult(dataEntry.getKey());
-		}
+	private void addDidYouMean(TokenizedData data){
+		setupButton();
 	}
+	
 }

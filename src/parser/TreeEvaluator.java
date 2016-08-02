@@ -1,5 +1,6 @@
 package parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import index.IIndex;
@@ -16,6 +17,19 @@ public class TreeEvaluator {
 			ec.setLastResult(result);
 		}
 		return result;
+	}
+	
+	public List<ISearchResult> evaluateTokens(List<String> tokens, IIndex index) {
+		List<ISearchResult> evaluations = new ArrayList<>();
+		while (!tokens.isEmpty()) {
+			List<Node> myRoots = new TreeFactory(index).createRoot(tokens);
+			evaluations.add(executeRoots(myRoots, index));
+		}
+		return evaluations;
+	}
+
+	private ISearchResult executeRoots(List<Node> roots, IIndex index) {
+		return new TreeEvaluator().evaluateRoots(roots, index);
 	}
 	
 }

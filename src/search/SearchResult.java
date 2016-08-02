@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import parser.TokenizedData;
+
 
 /**
  * Represents the results of a search query.
@@ -17,6 +19,7 @@ import java.util.Set;
 public class SearchResult implements ISearchResult {
 
 	private Map<String, Double> values; // URL -> value
+	private TokenizedData data;
 
 	/**
 	 * Constructor.
@@ -157,6 +160,16 @@ public class SearchResult implements ISearchResult {
 	
 	public Double tf(String url){
 		return this.values.get(url);
+	}
+
+	@Override
+	public void setTokenizedData(TokenizedData data) {
+		this.data = data;
+	}
+
+	@Override
+	public TokenizedData getTokenizedData() {
+		return data;
 	}
 	
 }

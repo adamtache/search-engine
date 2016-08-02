@@ -45,7 +45,7 @@ public class MainScreen implements IScreen {
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
-				mySearchResult.display(data.getResults());
+				mySearchResult.display(data);
 		    }
 		});
 	}

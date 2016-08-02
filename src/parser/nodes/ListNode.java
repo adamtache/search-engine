@@ -3,7 +3,7 @@ import java.util.List;
 
 import index.IIndex;
 import parser.EvaluationData;
-import parser.Parser;
+import parser.TreeEvaluator;
 import search.ISearchResult;
 
 /**
@@ -26,7 +26,7 @@ public class ListNode extends CommandNode {
 	 * @return list of evaluations of commands inside ListNode
 	 */
 	public List<ISearchResult> getEvaluations(IIndex index) {
-		return new Parser(index).evaluateTokens(clone(myInnerTokens));
+		return new TreeEvaluator().evaluateTokens(clone(myInnerTokens), index);
 	}
 
 	/**

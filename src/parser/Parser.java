@@ -6,25 +6,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import index.IIndex;
-import parser.nodes.Node;
-import search.ISearchResult;
 
 public class Parser {
 
-	private TreeFactory myTreeFactory;
 	private EvaluationData myController;
+	private SpellChecker mySpellChecker;
 
 	public Parser(IIndex index){
-		this.myTreeFactory = new TreeFactory(index);
 		this.myController = new EvaluationData(index);
+		this.mySpellChecker = new SpellChecker();
 	}
 
-	public List<String> tokenize(String term) {
-		myController.updateStatus("Split tokens by space.");
+	public TokenizedData tokenize(String term) {
 		List<String> tokens = Arrays.stream(term.split("\\s+")).map(String::toLowerCase)
 				.collect(Collectors.toCollection(ArrayList::new));
+		myController.updateStatus("Split tokens by space.");
 		tokens = this.removeRepeatingBooleanOperators(tokens);
-		myController.updateStatus("Checked for repeating boolean operators.");
+		myController.updateStatus("Filtered repeating boolean operators.");
 		tokens = this.separateParenthesis(tokens);
 		myController.updateStatus("Separated parenthesis.");
 		List<String> removedPunctuation = new ArrayList<>();
@@ -37,7 +35,16 @@ public class Parser {
 			}
 		}
 		myController.updateStatus("Tokenized: " + term);
-		return tokens;
+		List<String> spellCorrected = this.correctSpelling(tokens);
+		return new TokenizedData(tokens, spellCorrected, myController.getIndex());
+	}
+	
+	private List<String> correctSpelling(List<String> tokens){
+		List<String> corrected = new ArrayList<>();
+		for(String token : tokens){
+			corrected.add(mySpellChecker.getCorrect(token));
+		}
+		return corrected;
 	}
 
 	private List<String> removeRepeatingBooleanOperators(List<String> tokens){
@@ -83,19 +90,6 @@ public class Parser {
 			}
 		}
 		return tokens;
-	}
-
-	public List<ISearchResult> evaluateTokens(List<String> tokens) {
-		List<ISearchResult> evaluations = new ArrayList<>();
-		while (!tokens.isEmpty()) {
-			List<Node> myRoots = myTreeFactory.createRoot(tokens);
-			evaluations.add(executeRoots(myRoots));
-		}
-		return evaluations;
-	}
-
-	private ISearchResult executeRoots(List<Node> roots) {
-		return new TreeEvaluator().evaluateRoots(roots, myController.getIndex());
 	}
 
 }

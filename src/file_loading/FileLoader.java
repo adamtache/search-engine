@@ -33,4 +33,9 @@ public class FileLoader {
 	    }
 		return lines;
 	}
+
+	public String getString(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

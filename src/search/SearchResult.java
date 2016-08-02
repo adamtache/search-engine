@@ -59,6 +59,7 @@ public class SearchResult implements ISearchResult {
 	 * @param that
 	 * @return New ISearchResult object.
 	 */
+	@Override
 	public ISearchResult or(ISearchResult that) {
 		Map<String, Double> orMap = new HashMap<>(values);
 		Set<String> thatTerms = that.getValues().keySet();
@@ -74,6 +75,7 @@ public class SearchResult implements ISearchResult {
 	 * @param that
 	 * @return New ISearchResult object.
 	 */
+	@Override
 	public ISearchResult and(ISearchResult that) {
 		Map<String, Double> andMap = new HashMap<>();
 		for(String thatTerm : that.getValues().keySet()){
@@ -90,6 +92,7 @@ public class SearchResult implements ISearchResult {
 	 * @param that
 	 * @return New ISearchResult object.
 	 */
+	@Override
 	public ISearchResult minus(ISearchResult that) {
 		Map<String, Double> minusMap = new HashMap<>(values);
 		for(String thatTerm : that.getValues().keySet()){
@@ -127,11 +130,9 @@ public class SearchResult implements ISearchResult {
 		return entries;
 	}
 	
-	
 	public double getNumUrls(){
 		return this.values.keySet().size();
 	}
-
 	
 	public double getNumUrlsWithTerm(String term) {
 		int count = 0;

@@ -15,5 +15,11 @@ public interface ISearchResult {
 	public abstract Map<String, Double> getValues();
 
 	public abstract List<Entry<String, Double>> getResults();
+
+	public abstract ISearchResult and(ISearchResult that);
+
+	public abstract ISearchResult or(ISearchResult that);
+
+	public abstract ISearchResult minus(ISearchResult that);
 	
 }

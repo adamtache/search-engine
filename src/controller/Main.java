@@ -12,7 +12,7 @@ public class Main extends Application {
 	private static final int SCREEN_WIDTH = 800;
 	private static final int SCREEN_HEIGHT = 800;	
 	private Stage s;
-	IView view;
+	private IView view;
 	
     @Override
     public void start(Stage myStage) throws Exception {

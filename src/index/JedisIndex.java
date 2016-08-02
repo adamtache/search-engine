@@ -1,23 +1,17 @@
 package index;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
 import org.jsoup.select.Elements;
-
 import fetcher.Fetcher;
 import fetcher.WikiFetcher;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
-import search.ResultsComparator;
 import view.IView;
 
 /**
@@ -331,7 +325,7 @@ public class JedisIndex implements IIndex {
 			myView.updateStatus("Calculating TFIDF for " + term+" for URL: " + url);
 			double tfIdf = this.tfIdf(url, term);
 			myView.updateStatus("TFIDF: " + tfIdf);
-			results.put(term, tfIdf);
+			results.put(url, tfIdf);
 		}
 		return results;
 	}
@@ -402,5 +396,9 @@ public class JedisIndex implements IIndex {
 	//		}
 	//		return documentVector;
 	//	}
+	
+	public IView getView(){
+		return this.myView;
+	}
 
 }

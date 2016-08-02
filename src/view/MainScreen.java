@@ -52,7 +52,13 @@ public class MainScreen implements IScreen {
 
 	@Override
 	public void display(int result) {
-		myLuckyResult.display(result);
+		updateStatus("MainScreen loading webpage.");
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	myLuckyResult.display(result);
+		    }
+		});
 	}
 	
 	private void setBorderPaneSections(){

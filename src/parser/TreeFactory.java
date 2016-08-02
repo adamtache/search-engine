@@ -62,7 +62,7 @@ public class TreeFactory {
 		if(token.equals("-")){
 			return "Minus";
 		}
-		if(token.equals("+")){
+		if(token.equals("+") || token.equals("&")){
 			return "And";
 		}
 		if(token.length() == 0){

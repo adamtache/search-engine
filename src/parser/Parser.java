@@ -47,13 +47,13 @@ public class Parser {
 		String lastToken = tokens.get(0);
 		for(int x=0; x<tokens.size(); x++){
 			boolean repeatingAnds = lastToken.equals("and") && tokens.get(x).equals("and");
+			boolean repeatingAnds2 = lastToken.equals("&") && tokens.get(x).equals("&");
 			boolean repeatingOrs = lastToken.equals("or") && tokens.get(x).equals("or");
 			boolean repeatingMinus = lastToken.equals("-") && tokens.get(x).equals("-");
 			boolean repeatingMinus2 = lastToken.equals("minus") && tokens.get(x).equals("-");
 			boolean repeatingMinus3 = lastToken.equals("-") && tokens.get(x).equals("minus");
 			boolean repeatingMinus4 = lastToken.equals("minus") && tokens.get(x).equals("minus");
-			boolean repeatingPlus = lastToken.equals("+") && tokens.get(x).equals("+");
-			if(repeatingAnds || repeatingOrs || repeatingMinus || repeatingPlus || repeatingMinus2 || repeatingMinus3 || repeatingMinus4){
+			if(repeatingAnds || repeatingOrs || repeatingMinus || repeatingAnds2 || repeatingMinus2 || repeatingMinus3 || repeatingMinus4){
 				tokens.remove(x);
 				x--;
 			}

@@ -9,7 +9,7 @@ public class MinusNode extends BooleanNode {
 	@Override
 	public ISearchResult evaluate(EvaluationData myEvaluationController) {
 		IIndex index = myEvaluationController.getIndex();
-		index.getView().updateStatus("Evaluating AND operator.");
+		index.getView().updateStatus("Evaluating MINUS operator.");
 		return myEvaluationController.getLastResult().minus(evaluateChild(0, myEvaluationController));
 	}
 

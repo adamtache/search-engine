@@ -41,19 +41,6 @@ public class JedisWikiCrawler extends WikiCrawler{
 	}
 
 	/**
-	 * Constructor.
-	 * 
-	 * @param source
-	 * @param index
-	 */
-	public JedisWikiCrawler(String source, JedisIndex index, IView view) {
-		this.source = source;
-		this.index = index;
-		this.myView = view;
-		queue.offer(source);
-	}
-
-	/**
 	 * Returns the number of URLs in the queue.
 	 * 
 	 * @return
@@ -67,7 +54,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 		do {
 			this.crawlPage();
 			count ++;
-		} while (count < 10);
+		} while (count < 2);
 	}
 
 	/**

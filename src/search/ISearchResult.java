@@ -28,9 +28,6 @@ public interface ISearchResult {
 	
 	public abstract TokenizedData getTokenizedData();
 	
-	public default boolean checkCorrectedSpelling(){
-		TokenizedData data = this.getTokenizedData();
-		return !data.getTokens().equals(data.getSpellCorrected());
-	}
+	public abstract boolean checkCorrectedSpelling();
 	
 }

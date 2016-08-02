@@ -4,12 +4,14 @@ import java.util.Map;
 import java.util.Set;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import org.jsoup.select.Elements;
 import fetcher.Fetcher;
 import fetcher.WikiFetcher;
+import parser.Parser;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 import view.IView;
@@ -42,6 +44,24 @@ public class JedisIndex implements IIndex {
 	 */
 	private String urlSetKey(String term) {
 		return "URLSet:" + term;
+	}
+	
+	/**
+	 * Returns the Redis key to access Set of URLs indexed;
+	 * 
+	 * @return Redis key.
+	 */
+	private String urlKey() {
+		return "IndexedURLs";
+	}
+	
+	/**
+	 * Returns the Redis key to access document data of URL
+	 * 
+	 * @return Redis key.
+	 */
+	private String getDocKey(String url) {
+		return "DOC"+url;
 	}
 
 	/**
@@ -151,6 +171,9 @@ public class JedisIndex implements IIndex {
 	public Double getCount(String url, String term) {
 		String redisKey = termCounterKey(url);
 		String count = jedis.hget(redisKey, term);
+		if(count == null){
+			return new Double(0);
+		}
 		return new Double(count);
 	}
 
@@ -182,6 +205,7 @@ public class JedisIndex implements IIndex {
 		Transaction t = jedis.multi();
 
 		String url = tc.getLabel();
+		t.sadd(this.urlKey(), url);
 		String hashname = termCounterKey(url);
 		
 		// if this page has already been indexed; delete the old hash
@@ -312,6 +336,41 @@ public class JedisIndex implements IIndex {
 	public Fetcher getFetcher() {
 		return wf;
 	}
+	
+	@Override
+	public Set<String> getDocURLs(){
+		return jedis.smembers(this.urlKey());
+	}
+	
+	@Override
+	public Set<String> getDocTerms(){
+		// This needs to be updated.
+		List<String> sortedList = asSortedList(termSet());
+		Set<String> docTerms = new HashSet<>();
+		for(String sorted : sortedList){
+			if(Parser.isWord(sorted))
+				docTerms.add(sorted);
+		}
+		return docTerms;
+	}
+	
+	@Override
+	public void addDocumentsToDB() {
+		Set<String> docURLs = this.getDocURLs();
+		Set<String> terms = this.getDocTerms(); // TODO: Update this
+		for(String url : docURLs){
+			for(String term : terms){
+				double tfIdf = this.tfIdf(url, term);
+				jedis.hset(getDocKey(url), term, new String(tfIdf+""));
+			}
+		}
+	}
+	
+	private static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+	  List<T> list = new ArrayList<T>(c);
+	  java.util.Collections.sort(list);
+	  return list;
+	}
 
 	@Override
 	public Map<String, Double> getTfIdfs(String term) {
@@ -350,7 +409,7 @@ public class JedisIndex implements IIndex {
 		myView.updateStatus("Num Documents: " + numDocuments);
 		int documentFrequency = getURLs(term).size();
 		myView.updateStatus("Document Frequency: " + documentFrequency);
-		return Math.log((double) numDocuments/documentFrequency);
+		return 1 + Math.log((double) numDocuments/documentFrequency);
 	}
 
 	@Override
@@ -370,6 +429,11 @@ public class JedisIndex implements IIndex {
 	
 	public IView getView(){
 		return this.myView;
+	}
+
+	@Override
+	public String getDocValue(String url, String term) {
+		return jedis.hget(getDocKey(url), term);
 	}
 
 }

@@ -38,7 +38,7 @@ public class Parser {
 		List<String> spellCorrected = this.correctSpelling(tokens);
 		return new TokenizedData(tokens, spellCorrected, myController.getIndex());
 	}
-	
+
 	private List<String> correctSpelling(List<String> tokens){
 		List<String> corrected = new ArrayList<>();
 		for(String token : tokens){
@@ -74,22 +74,28 @@ public class Parser {
 	private List<String> separateParenthesis(List<String> tokens){
 		for(int x=0; x<tokens.size(); x++){
 			String token = tokens.get(x);
-			if(token.charAt(0) == '('){
-				if(token.length() > 1){
-					tokens.set(x, token.substring(1));
-					tokens.add(x, "(");
-					x++;
+			if(token.length() > 0){
+				if(token.charAt(0) == '('){
+					if(token.length() > 1){
+						tokens.set(x, token.substring(1));
+						tokens.add(x, "(");
+						x++;
+					}
 				}
-			}
-			if(token.charAt(token.length() - 1) == ')'){
-				if(token.length() > 1){
-					tokens.set(x, token.substring(0, token.length() - 1));
-					tokens.add(x, ")");
-					x++;
+				if(token.charAt(token.length() - 1) == ')'){
+					if(token.length() > 1){
+						tokens.set(x, token.substring(0, token.length() - 1));
+						tokens.add(x, ")");
+						x++;
+					}
 				}
 			}
 		}
 		return tokens;
+	}
+
+	public static boolean isWord(String str){
+		return str.matches("[a-zA-Z]+");
 	}
 
 }

@@ -15,5 +15,7 @@ public interface IController {
 	public abstract ISearchResult getResults();
 
 	public abstract String getResultUrl(int result);
+
+	public void start();
 	
 }

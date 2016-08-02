@@ -171,5 +171,14 @@ public class SearchResult implements ISearchResult {
 	public TokenizedData getTokenizedData() {
 		return data;
 	}
+
+	@Override
+	public boolean checkCorrectedSpelling() {
+		TokenizedData data = this.getTokenizedData();
+		if(data == null){
+			return false;
+		}
+		return !data.getTokens().equals(data.getSpellCorrected());
+	}
 	
 }

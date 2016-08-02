@@ -29,6 +29,6 @@ public interface IIndex {
 
 	public abstract void incrUpdateCount();
 
-	public abstract PriorityQueue<Entry<String, Double>> getTfIdfs(String term);
+	public abstract Map<String, Double> getTfIdfs(String term);
 
 }

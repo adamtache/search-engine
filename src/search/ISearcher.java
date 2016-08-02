@@ -6,6 +6,6 @@ public interface ISearcher {
 
 	public void search(String term) throws IOException;
 	
-	public ISearchData getResults(String term);
+	public ISearchResult getResults(String term);
 	
 }

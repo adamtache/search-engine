@@ -320,19 +320,18 @@ public class JedisIndex implements IIndex {
 	}
 
 	@Override
-	public PriorityQueue<Entry<String, Double>> getTfIdfs(String term) {
+	public Map<String, Double> getTfIdfs(String term) {
 		int numURLs = getURLs(term).size();
 		myView.updateStatus("Number URLs for term: " + numURLs);
 		if(numURLs == 0){
-			return new PriorityQueue<Entry<String, Double>>();
+			return new HashMap<String, Double>();
 		}
-		PriorityQueue<Entry<String, Double>> results = new PriorityQueue<Entry<String, Double>>(numURLs, new ResultsComparator());
+		Map<String, Double> results = new HashMap<String, Double>();
 		for(String url : getURLs(term)){
 			myView.updateStatus("Calculating TFIDF for " + term+" for URL: " + url);
 			double tfIdf = this.tfIdf(url, term);
-			Entry<String, Double> result = new AbstractMap.SimpleEntry<String, Double>(url, tfIdf);
-			myView.updateStatus("TFIDF: " + result.getValue());
-			results.add(result);
+			myView.updateStatus("TFIDF: " + tfIdf);
+			results.put(term, tfIdf);
 		}
 		return results;
 	}

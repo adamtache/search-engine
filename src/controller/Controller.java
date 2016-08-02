@@ -1,7 +1,7 @@
 package controller;
 
 import java.io.IOException;
-import search.ISearchData;
+import search.ISearchResult;
 import search.ISearcher;
 import search.Searcher;
 import view.IView;
@@ -35,14 +35,14 @@ public class Controller implements IController {
 	}
 
 	@Override
-	public ISearchData getResults() {
+	public ISearchResult getResults() {
 		myView.updateStatus("View getting results from searcher to send to MainScreen.");
 		return mySearcher.getResults(myView.getSearchTerm());
 	}
 
 	@Override
 	public String getResultUrl(int result) {
-		return getResults().get(result);
+		return getResults().getUrl(result);
 	}
 
 }

@@ -2,7 +2,7 @@ package controller;
 
 import java.io.IOException;
 
-import search.ISearchData;
+import search.ISearchResult;
 
 public interface IController {
 
@@ -12,7 +12,7 @@ public interface IController {
 	
 	public abstract void goTo(int page);
 
-	public abstract ISearchData getResults();
+	public abstract ISearchResult getResults();
 
 	public abstract String getResultUrl(int result);
 	

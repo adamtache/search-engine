@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import search.ISearchData;
+import search.ISearchResult;
 
 public class MainScreen implements IScreen {
 
@@ -40,12 +40,12 @@ public class MainScreen implements IScreen {
 	}
 
 	@Override
-	public void display(ISearchData data) {
+	public void display(ISearchResult data) {
 		updateStatus("MainScreen printing data");
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
-				mySearchResult.display(data.getEntries());
+				mySearchResult.display(data.getResults());
 		    }
 		});
 	}

@@ -44,7 +44,7 @@ public class SearchResult implements ISearchResult {
 	 * @param map
 	 */
 	public void print() {
-		List<Entry<String, Double>> entries = sort();
+		List<Entry<String, Double>> entries = getResults();
 		if(entries == null){
 			return;
 		}
@@ -120,7 +120,7 @@ public class SearchResult implements ISearchResult {
 	 * @return List of entries with URL and relevance.
 	 */
 	
-	public List<Entry<String, Double>> sort() {
+	public List<Entry<String, Double>> getResults() {
 		List<Entry<String, Double>> entries = new ArrayList<>(values.entrySet());
 		Comparator<Entry<String, Double>> comparator = new RelevanceComparator();
 		Collections.sort(entries, comparator);
@@ -145,7 +145,7 @@ public class SearchResult implements ISearchResult {
 
 	
 	public String getUrl(int result) {
-		return this.sort().get(result).getKey();
+		return this.getResults().get(result).getKey();
 	}
 	
 	

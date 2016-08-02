@@ -34,6 +34,9 @@ public class ListNode extends CommandNode {
 	 */
 	public ISearchResult evaluate(EvaluationData myEvaluationController) {
 		List<ISearchResult> evaluations = getEvaluations(myEvaluationController.getIndex());
+		if(evaluations.size() == 0){
+			return myEvaluationController.getLastResult();
+		}
 		return evaluations.get(evaluations.size() - 1);
 	}
 

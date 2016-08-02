@@ -37,8 +37,7 @@ public class Controller implements IController {
 	@Override
 	public ISearchResult getResults() {
 		myView.updateStatus("View getting results from searcher to send to MainScreen.");
-		ISearchResult results = mySearcher.getResults(myView.getSearchTerm());
-		return results;
+		return mySearcher.getResults(myView.getSearchTerm());
 	}
 
 	@Override

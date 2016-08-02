@@ -32,8 +32,15 @@ public class TreeFactory {
 		myEvaluationController.updateStatus("Creating tree for tokens: "+tokens);
 		List<Node> roots = new ArrayList<>();
 		while(tokens.size() != 0){
-			Node myRoot = createNode(tokens.remove(0));
-			createChildren(myRoot, tokens);
+			String token = tokens.remove(0);
+			Node myRoot;
+			if (isOpenParenthesis(token)) {
+				myRoot = createListNode(token, tokens);
+			}
+			else{
+				myRoot = createNode(token);
+				createChildren(myRoot, tokens);
+			}
 			roots.add(myRoot);
 		}
 		return roots;
@@ -131,13 +138,16 @@ public class TreeFactory {
 	 * 
 	 * @param List<String> tokens
 	 */
-	private List<String> createInnerListTokens(List<String> commandParts) {
+	private List<String> createInnerListTokens(List<String> tokens) {
 		List<String> innerCommands = new ArrayList<>();
 		int openParen = 1;
 		int closedParen = 0;
 		String currCommand;
 		while (openParen != closedParen) {
-			currCommand = commandParts.remove(0);
+			if(tokens.size() == 0) {
+				return innerCommands;
+			}
+			currCommand = tokens.remove(0);
 			if (isOpenParenthesis(currCommand)) {
 				openParen++;
 			}

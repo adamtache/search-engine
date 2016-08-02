@@ -57,6 +57,15 @@ public class JedisIndex implements IIndex {
 	private String termCounterKey(String url) {
 		return "TermCounter:" + url;
 	}
+	
+	/**
+	 * Returns the Redis key number of pages indexed.
+	 * 
+	 * @return Redis key.
+	 */
+	private String getNumIndexedKey() {
+		return "PagesIndexed";
+	}
 
 	/**
 	 * Checks whether we have a TermCounter for a given URL.
@@ -178,10 +187,10 @@ public class JedisIndex implements IIndex {
 
 		String url = tc.getLabel();
 		String hashname = termCounterKey(url);
-
+		
 		// if this page has already been indexed; delete the old hash
 		t.del(hashname);
-
+		
 		// for each term, add an entry in the termcounter and a new
 		// member of the index
 		for (String term: tc.keySet()) {
@@ -309,19 +318,18 @@ public class JedisIndex implements IIndex {
 	}
 
 	@Override
-	public PriorityQueue<Entry<String, Double>> getTfIds(String term) {
+	public PriorityQueue<Entry<String, Double>> getTfIdfs(String term) {
 		int numURLs = getURLs(term).size();
 		myView.updateStatus("Number URLs for term: " + numURLs);
 		if(numURLs == 0){
 			return new PriorityQueue<Entry<String, Double>>();
 		}
 		PriorityQueue<Entry<String, Double>> results = new PriorityQueue<Entry<String, Double>>(numURLs, new ResultsComparator());
-		myView.updateStatus("URLS: ~~~~~~~~~~~~~~~~~~~~~~ " + getURLs(term));
 		for(String url : getURLs(term)){
 			myView.updateStatus("Calculating TFIDF for " + term+" for URL: " + url);
 			double tfIdf = this.tfIdf(url, term);
 			Entry<String, Double> result = new AbstractMap.SimpleEntry<String, Double>(url, tfIdf);
-			myView.updateStatus("TFIDF Calculation done.");
+			myView.updateStatus("TFIDF: " + result.getValue());
 			results.add(result);
 		}
 		return results;
@@ -329,11 +337,7 @@ public class JedisIndex implements IIndex {
 	
 	@Override
 	public int getNumUrls(){
-		Set<String> uniqueUrls = new HashSet<>();
-		for (String term: termSet()) {
-			uniqueUrls.addAll(getURLs(term));
-		}
-		return uniqueUrls.size();
+		return Integer.parseInt(jedis.get(this.getNumIndexedKey()));
 	}
 
 
@@ -352,6 +356,21 @@ public class JedisIndex implements IIndex {
 		int documentFrequency = getURLs(term).size();
 		myView.updateStatus("Document Frequency: " + documentFrequency);
 		return Math.log((double) numDocuments/documentFrequency);
+	}
+
+	@Override
+	public void incrUpdateCount() {
+		Integer indexCount = Integer.parseInt(jedis.get(getNumIndexedKey()));
+		indexCount ++;
+		jedis.set(getNumIndexedKey(), new String(indexCount+""));
+	}
+
+	@Override
+	public void clear() {
+		this.deleteAllKeys();
+		this.deleteTermCounters();
+		this.deleteURLSets();
+		jedis.set(getNumIndexedKey(), new String("0"));
 	}
 
 	//	public double normalizedTfIdf(String term, String url, WikiSearch search){

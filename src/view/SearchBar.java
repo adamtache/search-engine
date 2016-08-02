@@ -122,4 +122,5 @@ public class SearchBar {
 	public Node getNode(){
 		return this.myRoot;
 	}
+	
 }

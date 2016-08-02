@@ -19,12 +19,6 @@ public class SearchData implements ISearchData {
 	}
 
 	@Override
-	public Entry<String, Double> poll() {
-		Entry<String, Double> top = data.peek();
-		return top;
-	}
-
-	@Override
 	public String get(int result) {
 		List<Entry<String, Double>> temp = new ArrayList<>();
 		for(int x=0; x<result; x++){
@@ -39,7 +33,6 @@ public class SearchData implements ISearchData {
 	@Override
 	public void print(){
 		List<Entry<String,Double>> entries = getEntries();
-		System.out.println("Data size: " + data.size());
 		for(Entry<String,Double> dataEntry: entries){
 			System.out.println("Visited: " + dataEntry.getKey()+" TF-IDF: " + dataEntry.getValue());
 		}
@@ -47,7 +40,7 @@ public class SearchData implements ISearchData {
 	
 	public List<Entry<String,Double>> getEntries(){
 		List<Entry<String, Double>> temp = new ArrayList<>();
-		for(int x=0; x<data.size(); x++){
+		for(int x=0; x <= data.size(); x++){
 			Entry<String, Double> dataEntry = data.poll();
 			temp.add(dataEntry);
 		}

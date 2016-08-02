@@ -1,8 +1,6 @@
 package search;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import crawler.JedisWikiCrawler;
 import index.IIndex;
 import index.JedisIndex;
@@ -14,7 +12,6 @@ public class Searcher implements ISearcher {
 	
 	private IIndex index;
 	private JedisWikiCrawler crawler;
-	private Set<ISearchData> prev_data;
 	private ISearchData current_data;
 	private IView myView;
 	
@@ -23,33 +20,33 @@ public class Searcher implements ISearcher {
 		this.myView = view;
 		this.index = new JedisIndex(jedis, myView);
 		crawler = new JedisWikiCrawler(index, view);
-		prev_data = new HashSet<>();
 	}
 	
 	public void search(String term) {
+//		clearDB();
+//		crawl();
+	}
+	
+	private void clearDB(){
 		myView.updateStatus("Controller clearing Redis database.");
 		clearDatabase();
+	}
+	
+	private void crawl(){
 		myView.updateStatus("Controller telling crawler to crawl.");
-		crawl();
-	}
-	
-	public ISearchData getResults(String term) {
-		myView.updateStatus("Searcher telling index to create TF-Idf data.");
-		current_data = new SearchData(index.getTfIds(term));
-		myView.updateStatus("Index created TF-Idf data.");
-		prev_data.add(current_data);
-		return current_data;
-	}
-	
-	private void crawl() {
 		crawler.crawl();
 		myView.updateStatus("Crawler finished crawling.");
 	}
 	
+	public ISearchData getResults(String term) {
+		myView.updateStatus("Searcher telling index to create TF-Idf data.");
+		current_data = new SearchData(index.getTfIdfs(term));
+		myView.updateStatus("Index created TF-Idf data.");
+		return current_data;
+	}
+	
 	private void clearDatabase(){
-		index.deleteAllKeys();
-		index.deleteTermCounters();
-		index.deleteURLSets();
+		index.clear();
 	}
 
 }

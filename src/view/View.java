@@ -4,6 +4,7 @@ import java.io.IOException;
 import controller.Controller;
 import controller.IController;
 import javafx.scene.Scene;
+import search.ISearchData;
 
 public class View implements IView {
 	

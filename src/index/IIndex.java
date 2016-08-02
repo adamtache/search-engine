@@ -9,8 +9,6 @@ import org.jsoup.select.Elements;
 import fetcher.Fetcher;
 
 public interface IIndex {
-	
-	public abstract PriorityQueue<Entry<String, Double>> getTfIds(String term);
 
 	public abstract Fetcher getFetcher();
 
@@ -26,10 +24,10 @@ public interface IIndex {
 
 	public abstract void indexPage(String crawlURL, Elements paragraphs);
 
-	public abstract void deleteAllKeys();
+	public abstract void clear();
 
-	public abstract void deleteTermCounters();
+	public abstract void incrUpdateCount();
 
-	public abstract void deleteURLSets();
+	public abstract PriorityQueue<Entry<String, Double>> getTfIdfs(String term);
 
 }

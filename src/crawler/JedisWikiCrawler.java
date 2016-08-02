@@ -44,6 +44,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 		this.index = index2;
 		this.myView = view;
 		queue.offer(source);
+		queue.offer("https://en.wikipedia.org/wiki/Claude_Shannon");
 	}
 
 	/**
@@ -67,6 +68,14 @@ public class JedisWikiCrawler extends WikiCrawler{
 	public int queueSize() {
 		return queue.size();	
 	}
+	
+	public void crawl(){
+		int count = 0;
+		do {
+			this.crawlPage();
+			count ++;
+		} while (count < 10);
+	}
 
 	/**
 	 * Gets a URL from the queue and indexes it.
@@ -75,19 +84,22 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * @return Number of pages indexed.
 	 * @throws IOException
 	 */
-	public String crawl() {
+	public String crawlPage() {
 		if (queue.isEmpty()) {
 			return null;
 		} else {
 			String crawlURL = queue.poll();
-			myView.updateStatus("CRAWLED: " + crawlURL);
+			myView.updateStatus("Crawler reached " + crawlURL);
 			Elements paragraphs;
 			if (index.isIndexed(crawlURL)) {
+				myView.updateStatus("Already indexed " + crawlURL);
 				return null;
 			} else {
+				myView.updateStatus("Fetching " + crawlURL);
 				paragraphs = wf.fetch(crawlURL);
 			}
 			index.indexPage(crawlURL, paragraphs);
+			index.incrUpdateCount();
 			queueInternalLinks(paragraphs);
 			return crawlURL;
 		}
@@ -107,29 +119,6 @@ public class JedisWikiCrawler extends WikiCrawler{
 					queue.offer("https://en.wikipedia.org" + relUrl);
 				}
 			}
-		}
-	}
-
-	public static void main(String[] args) throws IOException {
-		// make a WikiCrawler
-		Jedis jedis = JedisMaker.make();
-		JedisIndex index = new JedisIndex(jedis, new View(500,500)); 
-		String source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		JedisWikiCrawler wc = new JedisWikiCrawler(source, index, new View(500,500));
-
-		// for testing purposes, load up the queue
-		Elements paragraphs = wf.fetch(source);
-		wc.queueInternalLinks(paragraphs);
-
-		// loop until we index a new page
-		String res;
-		do {
-			res = wc.crawl();
-		} while (res == null);
-
-		Map<String, Integer> map = index.getCounts("the");
-		for (Entry<String, Integer> entry: map.entrySet()) {
-			System.out.println(entry);
 		}
 	}
 

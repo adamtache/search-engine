@@ -55,7 +55,6 @@ public class TreeFactory {
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			node = new TermNode(rootToken.toLowerCase());
 		}
-		node.initialize(myEvaluationController);
 		return node;
 	}
 
@@ -84,7 +83,6 @@ public class TreeFactory {
 		while (myRoot.numCurrentChildren() != myRoot.numRequiredChildren()) {
 			Node nextChild = createNextChild(myRoot, tokens);
 			if(nextChild != null){
-				nextChild.initialize(myEvaluationController);
 				myRoot.addChild(nextChild);
 			}
 			else{
@@ -154,21 +152,21 @@ public class TreeFactory {
 	}
 
 	/**
-	 * Determine if the string inputed is an open parenthesis
+	 * Determine if the token inputed is an open parenthesis
 	 * 
-	 * @param String str - string to be compared
+	 * @param String token - string to be compared
 	 */
-	private boolean isOpenParenthesis(String str) {
-		return str.equals("(");
+	private boolean isOpenParenthesis(String token) {
+		return token.equals("(");
 	}
 
 	/**
-	 * Determine if the string inputed is a closed parenthesis
+	 * Determine if the token inputed is a closed parenthesis
 	 * 
-	 * @param String str - string to be compared
+	 * @param String token - string to be compared
 	 */
-	private boolean isClosedParenthesis(String currCommand) {
-		return currCommand.equals(")");
+	private boolean isClosedParenthesis(String token) {
+		return token.equals(")");
 	}
 
 }

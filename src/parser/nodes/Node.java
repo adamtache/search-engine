@@ -12,8 +12,6 @@ public interface Node {
 	public abstract int numCurrentChildren();
 
 	public abstract int numRequiredChildren();
-
-	public abstract void initialize(EvaluationData myEvaluationController);
 	
 	public ISearchResult getLastResult();
 	

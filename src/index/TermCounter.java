@@ -2,37 +2,45 @@ package index;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-
 import crawler.NodeIterable;
 import fetcher.WikiFetcher;
+import file_loading.StopWordLoader;
 
 
 /**
  * Encapsulates a map from search term to frequency (count).
  * 
  * @author downey
+ * modified by adamtache to include stop words
  *
  */
 public class TermCounter {
-	
+
 	private Map<String, Integer> map;
 	private String label;
-	
-	public TermCounter(String label) {
+	private Set<String> stopWords;
+
+	public TermCounter(String label) throws IOException {
 		this.label = label;
 		this.map = new HashMap<String, Integer>();
+		this.stopWords = new HashSet<>();
+		setupStopWords();
 	}
 	
+	private void setupStopWords() throws IOException {
+		stopWords = new StopWordLoader().getLines();
+	}
+
 	public String getLabel() {
 		return label;
 	}
-	
+
 	/**
 	 * Returns the total of all counts.
 	 * 
@@ -56,7 +64,7 @@ public class TermCounter {
 			processTree(node);
 		}
 	}
-	
+
 	/**
 	 * Finds TextNodes in a DOM tree and counts their words.
 	 * 
@@ -80,7 +88,7 @@ public class TermCounter {
 	public void processText(String text) {
 		// replace punctuation with spaces, convert to lower case, and split on whitespace
 		String[] array = text.replaceAll("\\pP", " ").toLowerCase().split("\\s+");
-		
+
 		for (int i=0; i<array.length; i++) {
 			String term = array[i];
 			incrementTermCount(term);
@@ -94,7 +102,12 @@ public class TermCounter {
 	 */
 	public void incrementTermCount(String term) {
 		// System.out.println(term);
-		put(term, get(term) + 1);
+		if(!isStopWord(term))
+			put(term, get(term) + 1);
+	}
+	
+	private boolean isStopWord(String term){
+		return stopWords.contains(term);
 	}
 
 	/**
@@ -126,7 +139,7 @@ public class TermCounter {
 	public Set<String> keySet() {
 		return map.keySet();
 	}
-	
+
 	/**
 	 * Print the terms and their counts in arbitrary order.
 	 */
@@ -144,10 +157,10 @@ public class TermCounter {
 	 */
 	public static void main(String[] args) throws IOException {
 		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		
+
 		WikiFetcher wf = new WikiFetcher();
 		Elements paragraphs = wf.fetch(url);
-		
+
 		TermCounter counter = new TermCounter(url.toString());
 		counter.processElements(paragraphs);
 		counter.printCounts();

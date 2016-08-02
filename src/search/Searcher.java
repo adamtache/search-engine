@@ -22,7 +22,7 @@ public class Searcher implements ISearcher {
 		crawler = new JedisWikiCrawler(index, view);
 	}
 	
-	public void search(String term) {
+	public void search(String term) throws IOException {
 //		clearDB();
 //		crawl();
 	}
@@ -32,7 +32,7 @@ public class Searcher implements ISearcher {
 		clearDatabase();
 	}
 	
-	private void crawl(){
+	private void crawl() throws IOException{
 		myView.updateStatus("Controller telling crawler to crawl.");
 		crawler.crawl();
 		myView.updateStatus("Crawler finished crawling.");

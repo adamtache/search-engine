@@ -1,5 +1,6 @@
 package index;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
@@ -22,7 +23,7 @@ public interface IIndex {
 
 	public abstract boolean isIndexed(String crawlURL);
 
-	public abstract void indexPage(String crawlURL, Elements paragraphs);
+	public abstract void indexPage(String crawlURL, Elements paragraphs) throws IOException;
 
 	public abstract void clear();
 

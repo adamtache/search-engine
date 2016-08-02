@@ -69,7 +69,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 		return queue.size();	
 	}
 	
-	public void crawl(){
+	public void crawl() throws IOException{
 		int count = 0;
 		do {
 			this.crawlPage();
@@ -84,7 +84,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 	 * @return Number of pages indexed.
 	 * @throws IOException
 	 */
-	public String crawlPage() {
+	public String crawlPage() throws IOException {
 		if (queue.isEmpty()) {
 			return null;
 		} else {

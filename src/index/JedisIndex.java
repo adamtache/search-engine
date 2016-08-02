@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,8 +165,9 @@ public class JedisIndex implements IIndex {
 	 * 
 	 * @param url         URL of the page.
 	 * @param paragraphs  Collection of elements that should be indexed.
+	 * @throws IOException 
 	 */
-	public void indexPage(String url, Elements paragraphs) {
+	public void indexPage(String url, Elements paragraphs) throws IOException {
 		myView.updateStatus("Indexing " + url);
 
 		// make a TermCounter and count the terms in the paragraphs

@@ -17,7 +17,7 @@ public class Controller implements IController {
 	}
 
 	@Override
-	public void search(String term) {
+	public void search(String term) throws IOException {
 		myView.updateStatus("Controller telling searcher to search.");
 		mySearcher.search(term);
 	}

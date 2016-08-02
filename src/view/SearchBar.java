@@ -1,5 +1,6 @@
 package view;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import controller.IController;
@@ -60,7 +61,7 @@ public class SearchBar {
 	
 	private void runSearch(boolean isLucky){
 		Task<Void> task = createTask(new Callable<Void>() {
-			public Void call(){
+			public Void call() throws IOException{
 				myController.search(getSearchTerm());
 				return null;
 			}

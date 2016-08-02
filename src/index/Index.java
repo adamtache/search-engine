@@ -1,5 +1,6 @@
 package index;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -65,8 +66,9 @@ public abstract class Index {
 	 * 
 	 * @param url         URL of the page.
 	 * @param paragraphs  Collection of elements that should be indexed.
+	 * @throws IOException 
 	 */
-	public void indexPage(String url, Elements paragraphs) {
+	public void indexPage(String url, Elements paragraphs) throws IOException {
 		indexed.add(url);
 		TermCounter tc = new TermCounter(url);
 		tc.processElements(paragraphs);

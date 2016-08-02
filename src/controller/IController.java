@@ -1,10 +1,12 @@
 package controller;
 
+import java.io.IOException;
+
 import search.ISearchData;
 
 public interface IController {
 
-	public abstract void search(String term);
+	public abstract void search(String term) throws IOException;
 	
 	public abstract void display();
 	

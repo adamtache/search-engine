@@ -53,14 +53,14 @@ public class Parser {
 		}
 		String lastToken = tokens.get(0);
 		for(int x=0; x<tokens.size(); x++){
-			boolean repeatingAnds = lastToken.equals("and") && tokens.get(x).equals("and");
-			boolean repeatingAnds2 = lastToken.equals("&") && tokens.get(x).equals("&");
-			boolean repeatingOrs = lastToken.equals("or") && tokens.get(x).equals("or");
-			boolean repeatingMinus = lastToken.equals("-") && tokens.get(x).equals("-");
-			boolean repeatingMinus2 = lastToken.equals("minus") && tokens.get(x).equals("-");
-			boolean repeatingMinus3 = lastToken.equals("-") && tokens.get(x).equals("minus");
-			boolean repeatingMinus4 = lastToken.equals("minus") && tokens.get(x).equals("minus");
-			if(repeatingAnds || repeatingOrs || repeatingMinus || repeatingAnds2 || repeatingMinus2 || repeatingMinus3 || repeatingMinus4){
+			String currToken = tokens.get(x);
+			List<String> ands = new ArrayList<>(); ands.add("&"); ands.add("and");
+			List<String> ors = new ArrayList<>(); ors.add("+"); ors.add("or");
+			List<String> nots = new ArrayList<>(); nots.add("not"); nots.add("minus"); nots.add("-");
+			boolean repeatingAnds = ands.contains(currToken) && ands.contains(lastToken);
+			boolean repeatingOrs = ors.contains(currToken) && ors.contains(lastToken);;
+			boolean repeatingNots = nots.contains(currToken) && nots.contains(lastToken);
+			if(repeatingAnds || repeatingOrs || repeatingNots){
 				tokens.remove(x);
 				x--;
 			}

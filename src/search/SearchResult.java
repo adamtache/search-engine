@@ -156,4 +156,14 @@ public class SearchResult implements ISearchResult {
 		return !data.getTokens().equals(data.getSpellCorrected());
 	}
 	
+	public void print() {
+		List<Entry<String, Double>> entries = getResults();
+		if(entries == null){
+			return;
+		}
+		for (Entry<String, Double> entry: entries) {
+			System.out.println(entry);
+		}
+	}
+	
 }

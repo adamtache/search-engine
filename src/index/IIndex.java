@@ -1,6 +1,7 @@
 package index;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jsoup.select.Elements;
@@ -31,5 +32,7 @@ public interface IIndex {
 	boolean hasQueryData(String query);
 
 	ISearchResult getQueryResult(String query);
+
+	List<Double> getDoc(String url, Set<String> docTerms);
 
 }

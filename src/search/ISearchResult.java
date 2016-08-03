@@ -27,5 +27,7 @@ public interface ISearchResult {
 	public abstract TokenizedData getTokenizedData();
 	
 	public abstract boolean checkCorrectedSpelling();
+
+	public abstract void print();
 	
 }

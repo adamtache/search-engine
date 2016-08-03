@@ -22,7 +22,7 @@ public class JedisWikiCrawler {
 
 	// fetcher used to get pages from Wikipedia
 	final static WikiFetcher wf = new WikiFetcher();
-	
+
 	private IView myView;
 
 	/**
@@ -47,45 +47,46 @@ public class JedisWikiCrawler {
 	public int queueSize() {
 		return queue.size();	
 	}
-	
+
 	public void crawl() throws IOException{
+		boolean newPage = false;
 		int count = 0;
 		do {
-			this.crawlPage();
+			boolean update = this.crawlPage();
+			if(update) newPage = true;
 			count ++;
 		} while (count < 2);
+		if(newPage) updateDB();
 	}
 
 	/**
 	 * Gets a URL from the queue and indexes it.
 	 * @param b 
 	 * 
-	 * @return Number of pages indexed.
+	 * @return Indexed a new page
 	 * @throws IOException
 	 */
-	public String crawlPage() throws IOException {
-		if (queue.isEmpty()) {
-			return null;
+	public boolean crawlPage() throws IOException {
+		if (queue.isEmpty())
+			return false;
+		String crawlURL = queue.poll();
+		myView.updateStatus("Crawler reached " + crawlURL);
+		Elements paragraphs;
+		if (index.isIndexed(crawlURL)) {
+			myView.updateStatus("Already indexed " + crawlURL);
+			return false;
 		} else {
-			String crawlURL = queue.poll();
-			myView.updateStatus("Crawler reached " + crawlURL);
-			Elements paragraphs;
-			if (index.isIndexed(crawlURL)) {
-				myView.updateStatus("Already indexed " + crawlURL);
-				return null;
-			} else {
-				myView.updateStatus("Fetching " + crawlURL);
-				this.clearDBQueries();
-				paragraphs = wf.fetch(crawlURL);
-			}
-			index.indexPage(crawlURL, paragraphs);
-			queueInternalLinks(paragraphs);
-			return crawlURL;
+			myView.updateStatus("Fetching " + crawlURL);
+			this.updateDB();
+			paragraphs = wf.fetch(crawlURL);
 		}
+		index.indexPage(crawlURL, paragraphs);
+		queueInternalLinks(paragraphs);
+		return true;
 	}
-	
-	private void clearDBQueries(){
-		this.index.deleteQueryData();
+
+	private void updateDB(){
+		index.deleteQueryData();
 	}
 
 	/**

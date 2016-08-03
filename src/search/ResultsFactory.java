@@ -57,11 +57,9 @@ public class ResultsFactory {
 		Map<String, Double> cosSimMap = new HashMap<>();
 		Set<String> URLs = index.getDocURLs();
 		for(String url : URLs){
-			List<Double> doc = new ArrayList<>();
-			for(String docTerm : docTerms){
-				String docValue = index.getDocValue(url, docTerm);
-				doc.add(Double.parseDouble(docValue));
-			}
+			System.out.println("GETTING DOC FOR " + url);
+			List<Double> doc = index.getDoc(url, docTerms);
+			System.out.println("CALCULATING SIMILARITY");
 			double similarityValue = calculateSimilarity(doc, queryVector);
 			cosSimMap.put(url, similarityValue);
 		}
@@ -77,10 +75,12 @@ public class ResultsFactory {
 		if(queryLength == 0){
 			return 0;
 		}
+		System.out.println("FINISHED GETTING LENGTHS");
 		return getDotProduct(document, queryVector)/(docLength * queryLength);
 	}
 
 	private static double getDotProduct(List<Double> vector1, List<Double> vector2){
+		System.out.println("GETTING DOT PRODUCT");
 		double dotProduct = 0;
 		for(int x=0; x<vector1.size(); x++){
 			dotProduct += vector1.get(x) * vector2.get(x);
@@ -120,6 +120,9 @@ public class ResultsFactory {
 	}
 
 	private static boolean isVectorSpaceModel(List<String> tokens){
+		if(tokens.size() < 2){
+			return false;
+		}
 		for(String token : tokens){
 			if(isBooleanOperator(token)){
 				return false;

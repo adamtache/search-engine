@@ -3,6 +3,7 @@ package index;
 import java.util.Map;
 import java.util.Set;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.jsoup.select.Elements;
@@ -39,7 +40,16 @@ public class JedisIndex implements IIndex {
 	private String urlSetKey(String term) {
 		return "URLSet:" + term;
 	}
-	
+
+	/**
+	 * Returns the Redis key for a given search term.
+	 * 
+	 * @return Redis key.
+	 */
+	private String getValueKey(String url, String term) {
+		return "Value:" + url+term;
+	}
+
 	/**
 	 * Returns the Redis key for a given document
 	 * 
@@ -48,7 +58,16 @@ public class JedisIndex implements IIndex {
 	private String getDocKey(String url) {
 		return "Doc:" + url;
 	}
-	
+
+	/**
+	 * Returns the Redis key for a given document's values
+	 * 
+	 * @return Redis key.
+	 */
+	private String getDocValuesKey(String url) {
+		return "DocValues:" + url;
+	}
+
 	/**
 	 * Returns the Redis key for query results.
 	 * @param query 
@@ -58,7 +77,7 @@ public class JedisIndex implements IIndex {
 	private String queryKey(String query) {
 		return "Query"+query;
 	}
-	
+
 	/**
 	 * Returns the Redis key to access Set of URLs indexed.
 	 * 
@@ -67,11 +86,11 @@ public class JedisIndex implements IIndex {
 	private String urlKey() {
 		return "IndexedURLs";
 	}
-	
-	public int numberIndexedPages(){
-		return this.indexedPages().size();
+
+	public Long numberIndexedPages(){
+		return jedis.scard(urlKey());
 	}
-	
+
 	public Set<String> indexedPages(){
 		return jedis.smembers(urlKey());
 	}
@@ -145,7 +164,7 @@ public class JedisIndex implements IIndex {
 		// make a TermCounter and count the terms in the paragraphs
 		TermCounter tc = new TermCounter(url);
 		tc.processElements(paragraphs);
-		
+
 		// push the contents of the TermCounter to Redis
 		pushTermCounterToRedis(tc);
 	}
@@ -162,9 +181,9 @@ public class JedisIndex implements IIndex {
 		String url = tc.getLabel();
 		t.sadd(this.urlKey(), url);
 		String hashname = termCounterKey(url);
-		
+
 		t.del(hashname);
-		
+
 		for (String term: tc.keySet()) {
 			Integer count = tc.get(term);
 			t.hset(hashname, term, count.toString());
@@ -174,7 +193,7 @@ public class JedisIndex implements IIndex {
 		List<Object> res = t.exec();
 		return res;
 	}
-	
+
 	/**
 	 * Deletes all query data from the database.
 	 * 
@@ -192,6 +211,23 @@ public class JedisIndex implements IIndex {
 	}
 
 	/**
+	 * Deletes all query data from the database.
+	 * 
+	 * Called by controller when new pages are crawled to delete old data.
+	 * 
+	 * @return
+	 */
+	private void deleteDocData() {
+		Set<String> keys = jedis.keys("Doc:*");
+		keys.addAll(jedis.keys("DocValues:*"));
+		Transaction t = jedis.multi();
+		for (String key: keys) {
+			t.del(key);
+		}
+		t.exec();
+	}
+
+	/**
 	 * Returns URLSet keys for the terms that have been indexed.
 	 * 
 	 * Should be used for development and testing, not production.
@@ -201,7 +237,7 @@ public class JedisIndex implements IIndex {
 	public Set<String> urlSetKeys() {
 		return jedis.keys("URLSet:*");
 	}
-	
+
 	/**
 	 * Returns doc terms keys for the set of terms that have been indexed.
 	 * 
@@ -222,32 +258,48 @@ public class JedisIndex implements IIndex {
 	public Set<String> termCounterKeys() {
 		return jedis.keys("TermCounter:*");
 	}
-	
+
 	@Override
 	public Set<String> getDocURLs(){
 		return jedis.smembers(this.urlKey());
 	}
-	
+
 	@Override
 	public Set<String> getDocTerms(){
 		return jedis.smembers(this.docTermsKey());
 	}
-	
+
 	@Override
 	public void addDocumentsToDB() {
+		System.out.println("DELETING OLD DATA");
+		this.deleteDocData();
 		Set<String> docURLs = this.getDocURLs();
 		Set<String> terms = this.getDocTerms();
+		
 		for(String url : docURLs){
+			System.out.println("ON URL: " + url);
 			for(String term : terms){
 				double tfIdf = this.tfIdf(url, term);
-				jedis.hset(getDocKey(url), term, new String(tfIdf+""));
+				String valueLookup = jedis.get(getValueKey(url, term));
+				if(valueLookup != null){
+					tfIdf = Double.parseDouble(valueLookup);
+				}
+				else{
+					jedis.set(getValueKey(url, term), tfIdf+"");
+				}
+				String tfIdfStr = tfIdf+"";
+				Transaction t = jedis.multi();
+				t.hset(getDocKey(url), term, tfIdfStr);
+				t.rpush(getDocValuesKey(url), tfIdfStr);
+				t.exec();
 			}
 		}
+		System.out.println("FINISHED ADDING");
 	}
 
 	@Override
 	public Map<String, Double> getValues(String term) {
-		int numURLs = getURLs(term).size();
+		Long numURLs = jedis.scard(urlSetKey(term));
 		myView.updateStatus("Number URLs for term: " + numURLs);
 		if(numURLs == 0){
 			return new HashMap<String, Double>();
@@ -270,8 +322,8 @@ public class JedisIndex implements IIndex {
 	}
 
 	private Double idf(String term){
-		int numDocuments = this.numberIndexedPages();
-		int documentFrequency = getURLs(term).size();
+		Long numDocuments = this.numberIndexedPages();
+		Long documentFrequency = jedis.scard(urlSetKey(term));
 		return 1 + Math.log((double) numDocuments/documentFrequency);
 	}
 
@@ -287,7 +339,7 @@ public class JedisIndex implements IIndex {
 			jedis.hset(this.queryKey(query), url, results.get(url)+"");
 		}
 	}
-	
+
 	/**
 	 * Deletes all URLSet objects from the database.
 	 * 
@@ -335,12 +387,13 @@ public class JedisIndex implements IIndex {
 		}
 		t.exec();
 	}
-	
+
 	public void reset() {
 		this.deleteAllKeys();
 		this.deleteTermCounters();
 		this.deleteURLSets();
 		this.deleteQueryData();
+		this.deleteDocData();
 	}
 
 	@Override
@@ -357,6 +410,16 @@ public class JedisIndex implements IIndex {
 			queryMap.put(url, Double.parseDouble(value));
 		}
 		return new SearchResult(queryMap);
+	}
+
+	@Override
+	public List<Double> getDoc(String url, Set<String> docTerms) {
+		List<String> docValues = jedis.lrange(getDocValuesKey(url), 0, jedis.llen(getDocValuesKey(url)));
+		List<Double> doc = new ArrayList<>();
+		for(String value : docValues){
+			doc.add(Double.parseDouble(value));
+		}
+		return doc;
 	}
 
 }

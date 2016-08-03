@@ -1,17 +1,18 @@
 package view;
 
 import javafx.scene.Scene;
+import search.ISearchResult;
 
 public interface IView {
 	
-	public abstract void display(int page);
-	
-	public abstract String getSearchTerm();
-	
-	public void display();
+	public abstract String getSearchQuery();
 
 	public abstract Scene getScene();
 	
-	public void updateStatus(String status);
+	public abstract void updateStatus(String status);
+
+	public abstract void display(ISearchResult result);
+
+	public abstract void display(String url);
 	
 }

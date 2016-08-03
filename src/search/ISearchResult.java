@@ -10,8 +10,6 @@ public interface ISearchResult {
 
 	public abstract String getUrl(int result);
 
-	public abstract void print(); // For testing purposes.
-
 	public abstract Double getRelevance(String term);
 	
 	public abstract Map<String, Double> getValues();
@@ -28,9 +26,8 @@ public interface ISearchResult {
 	
 	public abstract TokenizedData getTokenizedData();
 	
-	public default boolean checkCorrectedSpelling(){
-		TokenizedData data = this.getTokenizedData();
-		return !data.getTokens().equals(data.getSpellCorrected());
-	}
+	public abstract boolean checkCorrectedSpelling();
+
+	public abstract void print();
 	
 }

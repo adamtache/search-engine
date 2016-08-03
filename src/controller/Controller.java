@@ -1,48 +1,76 @@
 package controller;
 
 import java.io.IOException;
+
+import crawler.JedisWikiCrawler;
+import index.IIndex;
+import index.JedisIndex;
+import index.JedisMaker;
+import parser.Parser;
 import search.ISearchResult;
-import search.ISearcher;
-import search.Searcher;
+import search.ResultsFactory;
 import view.IView;
 
-public class Controller implements IController {
-	
-	private ISearcher mySearcher;
+public class Controller {
+
 	private IView myView;
-	
+	private JedisWikiCrawler crawler;
+	private IIndex index;
+	private Parser myParser;
+	private ISearchResult myCurrentResult;
+
 	public Controller(IView view) throws IOException {
 		this.myView = view;
-		this.mySearcher = new Searcher(view);
+		new JedisMaker();
+		this.index = new JedisIndex(JedisMaker.make(), myView);
+		this.crawler = new JedisWikiCrawler(index, view);
+		this.myParser = new Parser(index);
 	}
 
-	@Override
-	public void search(String term) throws IOException {
-		myView.updateStatus("Controller telling searcher to search.");
-		mySearcher.search(term);
+	public void initialize(){
+//		System.out.println("RESETTING");
+//		myView.updateStatus("Controller resetting Redis database.");
+//		index.reset();
+//		System.out.println("CRAWLING");
+//		crawl();
 	}
 
-	@Override
-	public void display() {
-		myView.updateStatus("Controller telling view to display data.");
-		myView.display();
-	}
-	
-	@Override
-	public void goTo(int page){
-		myView.updateStatus("Controller telling view to display page.");
-		myView.display(page);
-	}
-
-	@Override
-	public ISearchResult getResults() {
-		myView.updateStatus("View getting results from searcher to send to MainScreen.");
-		return mySearcher.getResults(myView.getSearchTerm());
+	public ISearchResult getResults(String query) {
+		myView.updateStatus("Controller obtaining search results.");
+		if(index.hasQueryData(query)){
+			return index.getQueryResult(query);
+		}
+		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query));
+		this.index.storeQuery(query, result);
+		this.myCurrentResult = result;
+		return result;
 	}
 
-	@Override
-	public String getResultUrl(int result) {
-		return getResults().getUrl(result);
+	private void crawl() {
+		myView.updateStatus("Controller activating crawling.");
+		try {
+			crawler.crawl();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("FINISHED CRAWLING");
+		myView.updateStatus("Crawler finished crawling.");
+		index.addDocumentsToDB();
+	}
+
+	public void display(ISearchResult result) {
+		result.print();
+		myView.updateStatus("Controller initializing display of data.");
+		myView.display(result);
+	}
+
+	public void goToLucky(ISearchResult result){
+		myView.updateStatus("Controller initializing display of page.");
+		myView.display(result.getUrl(0));
+	}
+
+	public String getLuckyResult() {
+		return myCurrentResult.getUrl(0);
 	}
 
 }

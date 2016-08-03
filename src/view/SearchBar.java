@@ -1,9 +1,7 @@
 package view;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
-
-import controller.IController;
+import controller.Controller;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import search.ISearchResult;
 
 public class SearchBar {
 	
@@ -22,12 +21,12 @@ public class SearchBar {
 	private TextField textField;
 	private Button searchButton;
 	private Button feelingLuckyButton;
-	private IController myController;
+	private Controller myController;
 	private HBox myRoot;
 	private MainScreen myMainScreen;
 	private ProgressBar bar;
 	
-	public SearchBar(IController controller, MainScreen mainScreen){
+	public SearchBar(Controller controller, MainScreen mainScreen){
 		this.myController = controller;
 		this.myMainScreen = mainScreen;
 		initialize();
@@ -55,29 +54,16 @@ public class SearchBar {
 		this.searchButton = new Button("Search");
 		this.searchButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Search started.");
-			runSearch(false);
-		});
-	}
-	
-	private void runSearch(boolean isLucky){
-		Task<Void> task = createTask(new Callable<Void>() {
-			public Void call() throws IOException{
-				myController.search(getSearchTerm());
-				return null;
-			}
-		});
-		new Thread(task).start();
-		task.setOnSucceeded(event -> {
-		myMainScreen.updateStatus("Finished search.");
-		runDisplay(isLucky);
+			runDisplay(false);
 		});
 	}
 	
 	private void runDisplay(boolean isLucky){
 		Task<Void> task = createTask(new Callable<Void>() {
 			public Void call(){
-				if(isLucky) myController.goTo(0);
-				else myController.display();
+				ISearchResult result = myController.getResults(getSearchQuery());
+				if(isLucky) myController.goToLucky(result);
+				else myController.display(result);
 				return null;
 			}
 		}); 
@@ -92,7 +78,7 @@ public class SearchBar {
 		this.feelingLuckyButton = new Button("Feeling lucky?");
 		this.feelingLuckyButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Lucky search started.");
-			runSearch(true);
+			runDisplay(true);
 		});
 	}
 	
@@ -116,7 +102,7 @@ public class SearchBar {
 		return task;
 	}
 	
-	public String getSearchTerm() {
+	public String getSearchQuery() {
 		return this.textField.getText();
 	}
 	

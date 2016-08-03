@@ -14,7 +14,7 @@ import parser.TokenizedData;
 import search.ISearchResult;
 import search.ResultsFactory;
 
-public class SearchResult {
+public class SearchResults {
 	
 	private static final int PADDING = 10;
 	private VBox myRoot;
@@ -23,7 +23,7 @@ public class SearchResult {
 	private Button didYouMeanButton;
 	private ISearchResult data;
 
-	public SearchResult(StackPane resultPane){
+	public SearchResults(StackPane resultPane){
 		this.myResultPane = resultPane;
 		initialize();
 	}
@@ -41,7 +41,7 @@ public class SearchResult {
 		myRoot.getChildren().add(mySearchResults);
 	}
 	
-	private void setupButton(){
+	private void didYouKnowButton(){
 		TokenizedData tokenizedData = data.getTokenizedData();
 		List<String> spellCorrected = tokenizedData.getSpellCorrected();
 		this.didYouMeanButton = new Button("Did You Mean? " + spellCorrected);
@@ -70,7 +70,7 @@ public class SearchResult {
 	}
 
 	private void addDidYouMean(TokenizedData data){
-		setupButton();
+		didYouKnowButton();
 	}
 	
 }

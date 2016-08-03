@@ -1,4 +1,4 @@
-package file_loading;
+package loaders;
 
 import java.io.IOException;
 

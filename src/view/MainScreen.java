@@ -1,6 +1,6 @@
 package view;
 
-import controller.IController;
+import controller.Controller;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -9,18 +9,18 @@ import search.ISearchResult;
 
 public class MainScreen implements IScreen {
 
-	private IController myController;
+	private Controller myController;
 	private int myWidth;
 	private int myHeight;
 	private BorderPane myRoot;
 	private SearchBar mySearchBar;
 	private Scene myScene;
-	private LuckyResult myLuckyResult;
+	private WebBrowser myWebBrowser;
 	private StackPane myResultPane;
-	private SearchResult mySearchResult;
+	private SearchResults mySearchResult;
 	private StatusBar myStatusBar;
 	
-	public MainScreen(IController controller, int windowWidth, int windowHeight) {
+	public MainScreen(Controller controller, int windowWidth, int windowHeight) {
 		this.myController = controller;
 		this.myWidth = windowWidth;
 		this.myHeight = windowHeight;
@@ -32,8 +32,8 @@ public class MainScreen implements IScreen {
 		myStatusBar = new StatusBar(myWidth);
 		mySearchBar = new SearchBar(myController, this);
 		myResultPane = new StackPane();
-		myLuckyResult = new LuckyResult(myController, myResultPane);
-		mySearchResult = new SearchResult(myResultPane);
+		myWebBrowser = new WebBrowser(myResultPane);
+		mySearchResult = new SearchResults(myResultPane);
 		myResultPane.getChildren().add(mySearchResult.getNode());
 		setBorderPaneSections();
 		myScene = new Scene(myRoot, myWidth, myHeight);
@@ -41,23 +41,23 @@ public class MainScreen implements IScreen {
 	}
 
 	@Override
-	public void display(ISearchResult data) {
-		updateStatus("MainScreen printing data");
+	public void display(ISearchResult result) {
+		updateStatus("Displaying results.");
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
-				mySearchResult.display(data);
+				mySearchResult.display(result);
 		    }
 		});
 	}
 
 	@Override
-	public void display(int result) {
+	public void display(String url) {
 		updateStatus("MainScreen loading webpage.");
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
-		    	myLuckyResult.display(result);
+		    	myWebBrowser.display(url);
 		    }
 		});
 	}
@@ -76,8 +76,8 @@ public class MainScreen implements IScreen {
 		return myScene;
 	}
 	
-	public String getSearchTerm(){
-		return mySearchBar.getSearchTerm();
+	public String getSearchQuery(){
+		return mySearchBar.getSearchQuery();
 	}
 
 }

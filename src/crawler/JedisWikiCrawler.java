@@ -7,11 +7,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import fetcher.WikiFetcher;
 import index.IIndex;
-import index.JedisIndex;
 import view.IView;
 
 
-public class JedisWikiCrawler extends WikiCrawler{
+public class JedisWikiCrawler {
 	// keeps track of where we started
 	private final String source;
 
@@ -23,7 +22,7 @@ public class JedisWikiCrawler extends WikiCrawler{
 
 	// fetcher used to get pages from Wikipedia
 	final static WikiFetcher wf = new WikiFetcher();
-	
+
 	private IView myView;
 
 	/**
@@ -41,19 +40,6 @@ public class JedisWikiCrawler extends WikiCrawler{
 	}
 
 	/**
-	 * Constructor.
-	 * 
-	 * @param source
-	 * @param index
-	 */
-	public JedisWikiCrawler(String source, JedisIndex index, IView view) {
-		this.source = source;
-		this.index = index;
-		this.myView = view;
-		queue.offer(source);
-	}
-
-	/**
 	 * Returns the number of URLs in the queue.
 	 * 
 	 * @return
@@ -61,41 +47,46 @@ public class JedisWikiCrawler extends WikiCrawler{
 	public int queueSize() {
 		return queue.size();	
 	}
-	
+
 	public void crawl() throws IOException{
+		boolean newPage = false;
 		int count = 0;
 		do {
-			this.crawlPage();
+			boolean update = this.crawlPage();
+			if(update) newPage = true;
 			count ++;
-		} while (count < 10);
+		} while (count < 2);
+		if(newPage) updateDB();
 	}
 
 	/**
 	 * Gets a URL from the queue and indexes it.
 	 * @param b 
 	 * 
-	 * @return Number of pages indexed.
+	 * @return Indexed a new page
 	 * @throws IOException
 	 */
-	public String crawlPage() throws IOException {
-		if (queue.isEmpty()) {
-			return null;
+	public boolean crawlPage() throws IOException {
+		if (queue.isEmpty())
+			return false;
+		String crawlURL = queue.poll();
+		myView.updateStatus("Crawler reached " + crawlURL);
+		Elements paragraphs;
+		if (index.isIndexed(crawlURL)) {
+			myView.updateStatus("Already indexed " + crawlURL);
+			return false;
 		} else {
-			String crawlURL = queue.poll();
-			myView.updateStatus("Crawler reached " + crawlURL);
-			Elements paragraphs;
-			if (index.isIndexed(crawlURL)) {
-				myView.updateStatus("Already indexed " + crawlURL);
-				return null;
-			} else {
-				myView.updateStatus("Fetching " + crawlURL);
-				paragraphs = wf.fetch(crawlURL);
-			}
-			index.indexPage(crawlURL, paragraphs);
-			index.incrUpdateCount();
-			queueInternalLinks(paragraphs);
-			return crawlURL;
+			myView.updateStatus("Fetching " + crawlURL);
+			this.updateDB();
+			paragraphs = wf.fetch(crawlURL);
 		}
+		index.indexPage(crawlURL, paragraphs);
+		queueInternalLinks(paragraphs);
+		return true;
+	}
+
+	private void updateDB(){
+		index.deleteQueryData();
 	}
 
 	/**

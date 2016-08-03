@@ -1,20 +1,17 @@
 package view;
 
-import controller.IController;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
-public class LuckyResult {
+public class WebBrowser {
 	
 	private WebEngine myWebEngine;
 	private WebView myWebView;
-	private IController myController;
 	private StackPane myResultPane;
 	
-	public LuckyResult(IController controller, StackPane resultPane){
-		this.myController = controller;
+	public WebBrowser(StackPane resultPane){
 		this.myResultPane = resultPane;
 		initialize();
 	}
@@ -28,9 +25,14 @@ public class LuckyResult {
 		return myWebView;
 	}
 	
-	public void display(int result) {
-		myWebEngine.load(myController.getResultUrl(result));
+	public void loadURL(String url){
+		myWebEngine.load(url);
+	}
+	
+	public void display(String url) {
+		this.loadURL(url);
 		myResultPane.getChildren().clear();
 		myResultPane.getChildren().add(myWebView);
 	}
+	
 }

@@ -6,7 +6,7 @@ public interface IView {
 	
 	public abstract void display(int page);
 	
-	public abstract String getSearchTerm();
+	public abstract String getSearchQuery();
 	
 	public void display();
 

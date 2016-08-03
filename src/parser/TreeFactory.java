@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import file_loading.ResourceLoader;
 import index.IIndex;
+import loaders.ResourceLoader;
 import parser.nodes.ListNode;
 import parser.nodes.Node;
 import parser.nodes.ParenthesisNode;

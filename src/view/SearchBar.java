@@ -1,8 +1,6 @@
 package view;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
-
 import controller.IController;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -17,7 +15,7 @@ public class SearchBar {
 	
 	private static final String SEARCH_PROMPT = "Enter search query here.";
 	private static final int HBOX_SPACING = 10;
-	private static final double SEARCH_BAR_WIDTH = 300;
+	private static final double SEARCH_BAR_WIDTH = 500;
 	private static final int HBOX_PADDING = 20;
 	private TextField textField;
 	private Button searchButton;
@@ -55,21 +53,7 @@ public class SearchBar {
 		this.searchButton = new Button("Search");
 		this.searchButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Search started.");
-			runSearch(false);
-		});
-	}
-	
-	private void runSearch(boolean isLucky){
-		Task<Void> task = createTask(new Callable<Void>() {
-			public Void call() throws IOException{
-				myController.search(getSearchTerm());
-				return null;
-			}
-		});
-		new Thread(task).start();
-		task.setOnSucceeded(event -> {
-		myMainScreen.updateStatus("Finished search.");
-		runDisplay(isLucky);
+			runDisplay(false);
 		});
 	}
 	
@@ -92,7 +76,7 @@ public class SearchBar {
 		this.feelingLuckyButton = new Button("Feeling lucky?");
 		this.feelingLuckyButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Lucky search started.");
-			runSearch(true);
+			runDisplay(true);
 		});
 	}
 	
@@ -116,7 +100,7 @@ public class SearchBar {
 		return task;
 	}
 	
-	public String getSearchTerm() {
+	public String getSearchQuery() {
 		return this.textField.getText();
 	}
 	

@@ -68,7 +68,7 @@ public class JedisMaker {
 		//int port = 10534;
 		//String auth = System.getenv("REDISTOGO_AUTH");
 
-		Jedis jedis = new Jedis(host, port);
+		Jedis jedis = new Jedis(host, port, 1000000000);
 
 		try {
 			jedis.auth(auth);

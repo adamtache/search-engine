@@ -25,13 +25,13 @@ public class View implements IView {
 			e.printStackTrace();
 		}
 		myMainScreen = new MainScreen(myController, myWidth, myHeight);
-		myController.start();
+		myController.initialize();
 	}
 	
 	@Override
 	public void display() {
 		myMainScreen.updateStatus("View telling MainScreen to display results.");
-		myMainScreen.display(myController.getResults());
+		myMainScreen.display(myController.getResults(myMainScreen.getSearchQuery()));
 	}
 
 	@Override
@@ -40,8 +40,8 @@ public class View implements IView {
 	}
 
 	@Override
-	public String getSearchTerm() {
-		return myMainScreen.getSearchTerm();
+	public String getSearchQuery() {
+		return myMainScreen.getSearchQuery();
 	}
 	
 	public Scene getScene(){

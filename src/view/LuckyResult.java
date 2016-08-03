@@ -29,9 +29,9 @@ public class LuckyResult {
 	}
 	
 	public void display(int result) {
-		
-		myWebEngine.load(myController.getResultUrl(result));
+		myWebEngine.load(myController.getCurrentResult().getUrl(0));
 		myResultPane.getChildren().clear();
 		myResultPane.getChildren().add(myWebView);
 	}
+	
 }

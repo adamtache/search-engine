@@ -10,7 +10,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import crawler.NodeIterable;
 import fetcher.WikiFetcher;
-import file_loading.StopWordLoader;
+import loaders.StopWordLoader;
 
 
 /**

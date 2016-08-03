@@ -3,6 +3,7 @@ package view;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -14,7 +15,8 @@ import search.ISearchResult;
 import search.ResultsFactory;
 
 public class SearchResult {
-
+	
+	private static final int PADDING = 10;
 	private VBox myRoot;
 	private VBox mySearchResults;
 	private StackPane myResultPane;
@@ -32,6 +34,7 @@ public class SearchResult {
 
 	private void initialize(){
 		myRoot = new VBox();
+		myRoot.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
 		mySearchResults = new VBox();
 		Label results = new Label("Search Results:");
 		mySearchResults.getChildren().add(results);

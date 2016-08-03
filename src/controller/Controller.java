@@ -6,39 +6,30 @@ import crawler.JedisWikiCrawler;
 import index.IIndex;
 import index.JedisIndex;
 import index.JedisMaker;
-import redis.clients.jedis.Jedis;
+import parser.Parser;
 import search.ISearchResult;
-import search.ISearcher;
-import search.Searcher;
+import search.ResultsFactory;
 import view.IView;
 
 public class Controller implements IController {
 
-	private ISearcher mySearcher;
 	private IView myView;
 	private JedisWikiCrawler crawler;
 	private IIndex index;
+	private Parser myParser;
+	private ISearchResult myCurrentResult;
 
 	public Controller(IView view) throws IOException {
 		this.myView = view;
-		this.index = new JedisIndex(new JedisMaker().make(), myView);
-		this.mySearcher = new Searcher(view, index);
+		new JedisMaker();
+		this.index = new JedisIndex(JedisMaker.make(), myView);
 		this.crawler = new JedisWikiCrawler(index, view);
+		this.myParser = new Parser(index);
 	}
 
-	@Override
-	public void start(){
+	public void initialize(){
 		clearDB();
 		crawl();
-		createDocuments();
-	}
-
-	private void createDocuments(){
-		try {
-			Jedis index = new JedisMaker().make();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		index.addDocumentsToDB();
 	}
 
@@ -62,32 +53,28 @@ public class Controller implements IController {
 	}
 
 	@Override
-	public void search(String term) throws IOException {
-		myView.updateStatus("Controller telling searcher to search.");
-		mySearcher.search(term);
-	}
-
-	@Override
 	public void display() {
-		myView.updateStatus("Controller telling view to display data.");
+		myView.updateStatus("Controller initializing display of data.");
 		myView.display();
 	}
 
 	@Override
 	public void goTo(int page){
-		myView.updateStatus("Controller telling view to display page.");
+		myView.updateStatus("Controller initializing display of page.");
 		myView.display(page);
 	}
 
 	@Override
-	public ISearchResult getResults() {
-		myView.updateStatus("View getting results from searcher to send to MainScreen.");
-		return mySearcher.getResults(myView.getSearchTerm());
+	public ISearchResult getResults(String query) {
+		myView.updateStatus("Controller obtaining search results.");
+		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query));
+		this.myCurrentResult = result;
+		return result;
 	}
-
+	
 	@Override
-	public String getResultUrl(int result) {
-		return getResults().getUrl(result);
+	public ISearchResult getCurrentResult(){
+		return this.myCurrentResult;
 	}
 
 }

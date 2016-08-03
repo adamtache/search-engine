@@ -74,6 +74,7 @@ public class Parser {
 	private List<String> separateParenthesis(List<String> tokens){
 		for(int x=0; x<tokens.size(); x++){
 			String token = tokens.get(x);
+			if(token.equals("")) continue;
 			if(token.length() > 0){
 				if(token.charAt(0) == '('){
 					if(token.length() > 1){

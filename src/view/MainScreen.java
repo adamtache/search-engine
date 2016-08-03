@@ -29,7 +29,7 @@ public class MainScreen implements IScreen {
 	
 	private void initialize() {
 		myRoot = new BorderPane();
-		myStatusBar = new StatusBar();
+		myStatusBar = new StatusBar(myWidth);
 		mySearchBar = new SearchBar(myController, this);
 		myResultPane = new StackPane();
 		myLuckyResult = new LuckyResult(myController, myResultPane);
@@ -37,6 +37,7 @@ public class MainScreen implements IScreen {
 		myResultPane.getChildren().add(mySearchResult.getNode());
 		setBorderPaneSections();
 		myScene = new Scene(myRoot, myWidth, myHeight);
+		myScene.getStylesheets().add("resources/searchengine.css");
 	}
 
 	@Override
@@ -75,8 +76,8 @@ public class MainScreen implements IScreen {
 		return myScene;
 	}
 	
-	public String getSearchTerm(){
-		return mySearchBar.getSearchTerm();
+	public String getSearchQuery(){
+		return mySearchBar.getSearchQuery();
 	}
 
 }

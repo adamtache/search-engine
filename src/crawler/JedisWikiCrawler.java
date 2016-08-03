@@ -7,11 +7,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import fetcher.WikiFetcher;
 import index.IIndex;
-import index.JedisIndex;
 import view.IView;
 
 
-public class JedisWikiCrawler extends WikiCrawler{
+public class JedisWikiCrawler {
 	// keeps track of where we started
 	private final String source;
 

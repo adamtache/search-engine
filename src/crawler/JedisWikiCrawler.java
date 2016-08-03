@@ -75,13 +75,17 @@ public class JedisWikiCrawler {
 				return null;
 			} else {
 				myView.updateStatus("Fetching " + crawlURL);
+				this.clearDBQueries();
 				paragraphs = wf.fetch(crawlURL);
 			}
 			index.indexPage(crawlURL, paragraphs);
-			index.incrUpdateCount();
 			queueInternalLinks(paragraphs);
 			return crawlURL;
 		}
+	}
+	
+	private void clearDBQueries(){
+		this.index.deleteQueryData();
 	}
 
 	/**

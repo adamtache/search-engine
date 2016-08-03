@@ -20,11 +20,11 @@ public class Parser {
 	public TokenizedData tokenize(String term) {
 		List<String> tokens = Arrays.stream(term.split("\\s+")).map(String::toLowerCase)
 				.collect(Collectors.toCollection(ArrayList::new));
-		myController.updateStatus("Split tokens by space.");
+//		myController.updateStatus("Split tokens by space.");
 		tokens = this.removeRepeatingBooleanOperators(tokens);
-		myController.updateStatus("Filtered repeating boolean operators.");
+//		myController.updateStatus("Filtered repeating boolean operators.");
 		tokens = this.separateParenthesis(tokens);
-		myController.updateStatus("Separated parenthesis.");
+//		myController.updateStatus("Separated parenthesis.");
 		List<String> removedPunctuation = new ArrayList<>();
 		for(String token : tokens){
 			if(!(token.equals("(") || token.equals(")"))){
@@ -34,7 +34,7 @@ public class Parser {
 				removedPunctuation.add(token);
 			}
 		}
-		myController.updateStatus("Tokenized: " + term);
+//		myController.updateStatus("Tokenized: " + term);
 		List<String> spellCorrected = this.correctSpelling(tokens);
 		return new TokenizedData(tokens, spellCorrected, myController.getIndex());
 	}

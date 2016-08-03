@@ -18,11 +18,9 @@ public class ResultsFactory {
 	public static ISearchResult getSearchResult(TokenizedData tokenizedData){
 		List<String> tokens = tokenizedData.getTokens();
 		if(isVectorSpaceModel(tokens)){
-			tokenizedData.getIndex().getView().updateStatus("Evaluating vector space model.");
 			return getVectorModelData(tokens, tokenizedData.getIndex());
 		}
 		// Boolean model
-		tokenizedData.getIndex().getView().updateStatus("Evaluating boolean model.");
 		List<Node> roots = new TreeFactory(tokenizedData.getIndex()).createRoot(tokens);
 		return getData(roots, tokenizedData);
 	}
@@ -30,25 +28,18 @@ public class ResultsFactory {
 	public static ISearchResult getSpellCorrectedResult(TokenizedData tokenizedData){
 		List<String> correctedTokens = tokenizedData.getSpellCorrected();
 		if(isVectorSpaceModel(correctedTokens)){
-			tokenizedData.getIndex().getView().updateStatus("Evaluating vector space model with corrected spelling.");
 			return getVectorModelData(correctedTokens, tokenizedData.getIndex());
 		}
 		// Boolean model
-		tokenizedData.getIndex().getView().updateStatus("Evaluating boolean model with corrected spelling.");
 		List<Node> correctedRoots = new TreeFactory(tokenizedData.getIndex()).createRoot(correctedTokens);
 		return getData(correctedRoots, tokenizedData);
 	}
 
 	private static ISearchResult getVectorModelData(List<String> tokens, IIndex index){
-		System.out.println("TOKENS: " + tokens);
 		tokens = getOnlyTerms(tokens);
-		System.out.println("TOKENS: " + tokens);
 		Set<String> docTerms = index.getDocTerms();
-		System.out.println("DOC TERMS: " + docTerms +" SIZE: " + docTerms.size());
 		List<Double> queryVector = getQueryVector(docTerms, tokens);
-		System.out.println("QUERY VECTOR: " + queryVector +" SIZE: " + queryVector.size());
 		Map<String, Double> cosSimMap = getCosSimMap(docTerms, queryVector, index);
-		System.out.println("COS SIM MAP: " + cosSimMap);
 		return new SearchResult(cosSimMap);
 	}
 

@@ -9,7 +9,6 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import crawler.NodeIterable;
-import fetcher.WikiFetcher;
 import loaders.StopWordLoader;
 
 
@@ -101,7 +100,6 @@ public class TermCounter {
 	 * @param term
 	 */
 	public void incrementTermCount(String term) {
-		// System.out.println(term);
 		if(!isStopWord(term))
 			put(term, get(term) + 1);
 	}
@@ -139,30 +137,5 @@ public class TermCounter {
 	public Set<String> keySet() {
 		return map.keySet();
 	}
-
-	/**
-	 * Print the terms and their counts in arbitrary order.
-	 */
-	public void printCounts() {
-		for (String key: keySet()) {
-			Integer count = get(key);
-			System.out.println(key + ", " + count);
-		}
-		System.out.println("Total of all counts = " + size());
-	}
-
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-
-		WikiFetcher wf = new WikiFetcher();
-		Elements paragraphs = wf.fetch(url);
-
-		TermCounter counter = new TermCounter(url.toString());
-		counter.processElements(paragraphs);
-		counter.printCounts();
-	}
+	
 }

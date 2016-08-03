@@ -3,40 +3,33 @@ package index;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
 import org.jsoup.select.Elements;
-
-import fetcher.Fetcher;
-import view.IView;
+import search.ISearchResult;
 
 public interface IIndex {
 
-	public abstract Fetcher getFetcher();
+	void storeQuery(String query, ISearchResult result);
 
-	public Double tfIdf(String url, String term);
+	void indexPage(String crawlURL, Elements paragraphs) throws IOException;
 
-	public Double idf(String term);
+	boolean isIndexed(String crawlURL);
 
-	public abstract int getNumUrls();
+	void deleteQueryData();
 
-	public abstract boolean isIndexed(String crawlURL);
+	Set<String> getDocURLs();
 
-	public abstract void indexPage(String crawlURL, Elements paragraphs) throws IOException;
+	String getDocValue(String url, String docTerm);
 
-	public abstract void clear();
+	Map<String, Double> getValues(String myTerm);
 
-	public abstract void incrUpdateCount();
+	void reset();
 
-	public abstract Map<String, Double> getTfIdfs(String term);
-	
-	public abstract IView getView();
+	void addDocumentsToDB();
 
-	public abstract void addDocumentsToDB();
+	Set<String> getDocTerms();
 
-	public abstract Set<String> getDocURLs();
+	boolean hasQueryData(String query);
 
-	public abstract Set<String> getDocTerms();
-
-	public abstract String getDocValue(String url, String term);
+	ISearchResult getQueryResult(String query);
 
 }

@@ -11,7 +11,7 @@ import search.ISearchResult;
 import search.ResultsFactory;
 import view.IView;
 
-public class Controller implements IController {
+public class Controller {
 
 	private IView myView;
 	private JedisWikiCrawler crawler;
@@ -28,53 +28,45 @@ public class Controller implements IController {
 	}
 
 	public void initialize(){
-		clearDB();
-		crawl();
-		index.addDocumentsToDB();
+//		myView.updateStatus("Controller resetting Redis database.");
+//		index.reset();
+//		crawl();
 	}
-
-	private void clearDB(){
-		myView.updateStatus("Controller clearing Redis database.");
-		clearDatabase();
+	
+	public ISearchResult getResults(String query) {
+		myView.updateStatus("Controller obtaining search results.");
+		if(index.hasQueryData(query)){
+			return index.getQueryResult(query);
+		}
+		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query));
+		this.index.storeQuery(query, result);
+		this.myCurrentResult = result;
+		return result;
 	}
 
 	private void crawl() {
-		myView.updateStatus("Controller telling crawler to crawl.");
+		myView.updateStatus("Controller activating crawling.");
 		try {
 			crawler.crawl();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		myView.updateStatus("Crawler finished crawling.");
+		index.addDocumentsToDB();
 	}
 
-	private void clearDatabase(){
-		index.clear();
-	}
-
-	@Override
-	public void display() {
+	public void display(ISearchResult result) {
 		myView.updateStatus("Controller initializing display of data.");
-		myView.display();
+		myView.display(result);
 	}
 
-	@Override
-	public void goTo(int page){
+	public void goToLucky(ISearchResult result){
 		myView.updateStatus("Controller initializing display of page.");
-		myView.display(page);
+		myView.display(result.getUrl(0));
 	}
 
-	@Override
-	public ISearchResult getResults(String query) {
-		myView.updateStatus("Controller obtaining search results.");
-		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query));
-		this.myCurrentResult = result;
-		return result;
-	}
-	
-	@Override
-	public ISearchResult getCurrentResult(){
-		return this.myCurrentResult;
+	public String getLuckyResult() {
+		return myCurrentResult.getUrl(0);
 	}
 
 }

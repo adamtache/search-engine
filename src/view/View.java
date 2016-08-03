@@ -2,12 +2,12 @@ package view;
 
 import java.io.IOException;
 import controller.Controller;
-import controller.IController;
 import javafx.scene.Scene;
+import search.ISearchResult;
 
 public class View implements IView {
 	
-	private IController myController;
+	private Controller myController;
 	private MainScreen myMainScreen;
 	private int myWidth;
 	private int myHeight;
@@ -29,14 +29,14 @@ public class View implements IView {
 	}
 	
 	@Override
-	public void display() {
+	public void display(ISearchResult result) {
 		myMainScreen.updateStatus("View telling MainScreen to display results.");
-		myMainScreen.display(myController.getResults(myMainScreen.getSearchQuery()));
+		myMainScreen.display(result);
 	}
 
 	@Override
-	public void display(int result) {
-		myMainScreen.display(result);
+	public void display(String url) {
+		myMainScreen.display(url);
 	}
 
 	@Override

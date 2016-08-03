@@ -16,7 +16,7 @@ public class TreeFactory {
 	private ResourceLoader myResourceLoader;
 	private String COMMAND_PATH;
 	private String CLASS_EXTENSION;
-	private EvaluationData myEvaluationController;
+//	private EvaluationData myEvaluationController;
 
 	public TreeFactory(IIndex index){
 		try {
@@ -24,12 +24,12 @@ public class TreeFactory {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.myEvaluationController = new EvaluationData(index);
+//		this.myEvaluationController = new EvaluationData(index);
 		this.initResources();
 	}
 
 	public List<Node> createRoot(List<String> tokens) {
-		myEvaluationController.updateStatus("Creating tree for tokens: "+tokens);
+//		myEvaluationController.updateStatus("Creating tree for tokens: "+tokens);
 		List<Node> roots = new ArrayList<>();
 		while(tokens.size() != 0){
 			String token = tokens.remove(0);

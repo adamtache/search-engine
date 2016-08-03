@@ -10,8 +10,6 @@ public interface ISearchResult {
 
 	public abstract String getUrl(int result);
 
-	public abstract void print(); // For testing purposes.
-
 	public abstract Double getRelevance(String term);
 	
 	public abstract Map<String, Double> getValues();

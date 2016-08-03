@@ -42,21 +42,6 @@ public class SearchResult implements ISearchResult {
 	}
 
 	/**
-	 * Prints the contents in order of term frequency.
-	 * 
-	 * @param map
-	 */
-	public void print() {
-		List<Entry<String, Double>> entries = getResults();
-		if(entries == null){
-			return;
-		}
-		for (Entry<String, Double> entry: entries) {
-			System.out.println(entry);
-		}
-	}
-
-	/**
 	 * Computes the union of two search results.
 	 * 
 	 * @param that

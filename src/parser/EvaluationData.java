@@ -24,8 +24,4 @@ public class EvaluationData {
 		this.last_result = result;
 	}
 	
-	public void updateStatus(String status){
-		this.myIndex.getView().updateStatus(status);
-	}
-	
 }

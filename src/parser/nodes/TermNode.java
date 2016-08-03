@@ -14,8 +14,8 @@ public class TermNode extends CommandNode {
 
 	@Override
 	public ISearchResult evaluate(EvaluationData myEvaluationController) {
-		myEvaluationController.updateStatus("Evaluating " + myTerm);
-		return new SearchResult(myEvaluationController.getIndex().getTfIdfs(myTerm));
+//		myEvaluationController.updateStatus("Evaluating " + myTerm);
+		return new SearchResult(myEvaluationController.getIndex().getValues(myTerm));
 	}
 	
 }

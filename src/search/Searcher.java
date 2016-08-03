@@ -30,8 +30,8 @@ public class Searcher implements ISearcher {
 	}
 
 	public void search(String term) throws IOException {
-		//		clearDB();
-		//		crawl();
+				clearDB();
+				crawl();
 	}
 
 	private void clearDB(){

@@ -17,7 +17,7 @@ public class SearchBar {
 	
 	private static final String SEARCH_PROMPT = "Enter search query here.";
 	private static final int HBOX_SPACING = 10;
-	private static final double SEARCH_BAR_WIDTH = 300;
+	private static final double SEARCH_BAR_WIDTH = 500;
 	private static final int HBOX_PADDING = 20;
 	private TextField textField;
 	private Button searchButton;

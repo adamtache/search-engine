@@ -1,25 +1,26 @@
 package view;
 
-
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
 public class StatusBar{
 	
-	private static final int WINDOW_WIDTH = 800;
+	private static final int MY_HEIGHT = 100;
 	private TextArea myStatusOutput;
 	private ScrollPane myStatusPane;
+	private int myWidth;
 	
-	public StatusBar(){
+	public StatusBar(int windowWidth){
+		this.myWidth = windowWidth;
 		initialize();
 	}
 	
 	private void initialize(){
 		myStatusPane = new ScrollPane();
 		myStatusOutput = new TextArea("Awaiting user input.\n");
-		myStatusOutput.setPrefWidth(WINDOW_WIDTH);
-		myStatusOutput.setPrefHeight(150);
+		myStatusOutput.setPrefWidth(myWidth);
+		myStatusOutput.setPrefHeight(MY_HEIGHT);
 		myStatusPane.setContent(myStatusOutput);
 	}
 	

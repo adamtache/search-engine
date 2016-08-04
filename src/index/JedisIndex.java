@@ -5,6 +5,7 @@ import java.util.Set;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import org.jsoup.select.Elements;
 import redis.clients.jedis.Jedis;
@@ -271,30 +272,26 @@ public class JedisIndex implements IIndex {
 
 	@Override
 	public void addDocumentsToDB() {
-		System.out.println("DELETING OLD DATA");
 		this.deleteDocData();
 		Set<String> docURLs = this.getDocURLs();
 		Set<String> terms = this.getDocTerms();
-		
 		for(String url : docURLs){
-			System.out.println("ON URL: " + url);
 			for(String term : terms){
 				double tfIdf = this.tfIdf(url, term);
-				String valueLookup = jedis.get(getValueKey(url, term));
-				if(valueLookup != null){
-					tfIdf = Double.parseDouble(valueLookup);
+				String tfIdfStr = tfIdf + "";
+				String dbLookup = jedis.get(getValueKey(url, term));
+				if(dbLookup != null){
+					tfIdf = Double.parseDouble(dbLookup);
 				}
 				else{
-					jedis.set(getValueKey(url, term), tfIdf+"");
+					jedis.set(getValueKey(url, term), tfIdfStr);
 				}
-				String tfIdfStr = tfIdf+"";
 				Transaction t = jedis.multi();
 				t.hset(getDocKey(url), term, tfIdfStr);
 				t.rpush(getDocValuesKey(url), tfIdfStr);
 				t.exec();
 			}
 		}
-		System.out.println("FINISHED ADDING");
 	}
 
 	@Override
@@ -334,6 +331,7 @@ public class JedisIndex implements IIndex {
 
 	@Override
 	public void storeQuery(String query, ISearchResult result) {
+		if(result == null) return;
 		Map<String, Double> results = result.getValues();
 		for(String url : results.keySet()){
 			jedis.hset(this.queryKey(query), url, results.get(url)+"");
@@ -420,6 +418,27 @@ public class JedisIndex implements IIndex {
 			doc.add(Double.parseDouble(value));
 		}
 		return doc;
+	}
+
+	@Override
+	public Set<String> getMatchingDocURLs(List<String> tokens) {
+		Set<String> docURLs = jedis.smembers(this.urlKey());
+		Set<String> matches = new HashSet<>();
+		for(String url : docURLs){
+			boolean match = false;
+			for(String token : tokens){
+				double count = getCount(url, token);
+				if(count > 0){
+					match = true;
+					break;
+				}
+			}
+			if(match){
+				matches.add(url);
+				continue;
+			}
+		}
+		return matches;
 	}
 
 }

@@ -35,4 +35,6 @@ public interface IIndex {
 
 	List<Double> getDoc(String url, Set<String> docTerms);
 
+	Set<String> getMatchingDocURLs(List<String> tokens);
+
 }

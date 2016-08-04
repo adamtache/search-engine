@@ -39,7 +39,7 @@ public class ResultsFactory {
 		tokens = getOnlyTerms(tokens);
 		Set<String> docTerms = index.getDocTerms();
 		List<Double> queryVector = getQueryVector(docTerms, tokens);
-		Map<String, Double> cosSimMap = getCosSimMap(docTerms, queryVector, index);
+		Map<String, Double> cosSimMap = getCosSimMap(tokens, docTerms, queryVector, index);
 		return new SearchResult(cosSimMap);
 	}
 
@@ -53,13 +53,11 @@ public class ResultsFactory {
 		return terms;
 	}
 
-	private static Map<String, Double> getCosSimMap(Set<String> docTerms, List<Double> queryVector, IIndex index){
+	private static Map<String, Double> getCosSimMap(List<String> tokens, Set<String> docTerms, List<Double> queryVector, IIndex index){
 		Map<String, Double> cosSimMap = new HashMap<>();
-		Set<String> URLs = index.getDocURLs();
+		Set<String> URLs = index.getMatchingDocURLs(tokens);
 		for(String url : URLs){
-			System.out.println("GETTING DOC FOR " + url);
 			List<Double> doc = index.getDoc(url, docTerms);
-			System.out.println("CALCULATING SIMILARITY");
 			double similarityValue = calculateSimilarity(doc, queryVector);
 			cosSimMap.put(url, similarityValue);
 		}
@@ -75,12 +73,10 @@ public class ResultsFactory {
 		if(queryLength == 0){
 			return 0;
 		}
-		System.out.println("FINISHED GETTING LENGTHS");
 		return getDotProduct(document, queryVector)/(docLength * queryLength);
 	}
 
 	private static double getDotProduct(List<Double> vector1, List<Double> vector2){
-		System.out.println("GETTING DOT PRODUCT");
 		double dotProduct = 0;
 		for(int x=0; x<vector1.size(); x++){
 			dotProduct += vector1.get(x) * vector2.get(x);
@@ -144,7 +140,8 @@ public class ResultsFactory {
 
 	private static ISearchResult getData(List<Node> roots, TokenizedData tokenizedData){
 		ISearchResult data = evaluateRoots(roots, tokenizedData.getIndex());
-		data.setTokenizedData(tokenizedData);
+		if(data != null)
+			data.setTokenizedData(tokenizedData);
 		return data;
 	}
 

@@ -55,7 +55,6 @@ public class SearchResults {
 		this.data = data;
 		myResultPane.getChildren().clear();
 		myResultPane.getChildren().add(myRoot);
-		mySearchResults.getChildren().clear();
 		if(data.checkCorrectedSpelling()){
 			this.addDidYouMean(data.getTokenizedData());
 		}

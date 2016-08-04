@@ -28,11 +28,11 @@ public class Controller {
 	}
 
 	public void initialize(){
-//		System.out.println("RESETTING");
-//		myView.updateStatus("Controller resetting Redis database.");
-//		index.reset();
-//		System.out.println("CRAWLING");
-//		crawl();
+		//		System.out.println("RESETTING");
+		//		myView.updateStatus("Controller resetting Redis database.");
+		//		index.reset();
+		//		System.out.println("CRAWLING");
+		//		crawl();
 	}
 
 	public ISearchResult getResults(String query) {
@@ -59,7 +59,6 @@ public class Controller {
 	}
 
 	public void display(ISearchResult result) {
-		result.print();
 		myView.updateStatus("Controller initializing display of data.");
 		myView.display(result);
 	}

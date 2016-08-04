@@ -38,7 +38,8 @@ public class ResultsFactory {
 	private static ISearchResult getVectorModelData(List<String> tokens, IIndex index){
 		tokens = getOnlyTerms(tokens);
 		Set<String> docTerms = index.getDocTerms();
-		List<Double> queryVector = getQueryVector(docTerms, tokens);
+		Query query = getQuery(docTerms, tokens);
+		List<Double> queryVector = query.getQueryVector();
 		Map<String, Double> cosSimMap = getCosSimMap(tokens, docTerms, queryVector, index);
 		return new SearchResult(cosSimMap);
 	}
@@ -92,7 +93,9 @@ public class ResultsFactory {
 		return Math.sqrt(length);
 	}
 
-	private static List<Double> getQueryVector(Set<String> docTerms, List<String> tokens){
+	private static Query getQuery(Set<String> docTerms, List<String> tokens){
+		List<String> docTermList = new ArrayList<>(docTerms);
+		Map<String, Double> queryMap = new HashMap<>();
 		List<Double> queryVector = new ArrayList<>();
 		double maxTf = 0;
 		for(String term : docTerms){
@@ -111,8 +114,9 @@ public class ResultsFactory {
 			double tf = queryVector.get(x);
 			if(tf != 0)
 				queryVector.set(x, Math.log(tokens.size() / tf) * tf / maxTf);
+			queryMap.put(docTermList.get(x), queryVector.get(x));
 		}
-		return queryVector;
+		return new Query(queryMap);
 	}
 
 	private static boolean isVectorSpaceModel(List<String> tokens){

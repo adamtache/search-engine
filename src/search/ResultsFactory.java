@@ -40,7 +40,7 @@ public class ResultsFactory {
 		Set<String> docTerms = index.getDocTerms();
 		Query query = getQuery(docTerms, tokens);
 		List<Double> queryVector = query.getQueryVector();
-		Map<String, Double> cosSimMap = getCosSimMap(tokens, docTerms, queryVector, index);
+		Map<Document, Double> cosSimMap = getCosSimMap(tokens, docTerms, queryVector, index);
 		return new SearchResult(cosSimMap);
 	}
 
@@ -54,13 +54,14 @@ public class ResultsFactory {
 		return terms;
 	}
 
-	private static Map<String, Double> getCosSimMap(List<String> tokens, Set<String> docTerms, List<Double> queryVector, IIndex index){
-		Map<String, Double> cosSimMap = new HashMap<>();
+	private static Map<Document, Double> getCosSimMap(List<String> tokens, Set<String> docTerms, List<Double> queryVector, IIndex index){
+		Map<Document, Double> cosSimMap = new HashMap<>();
 		Set<String> URLs = index.getMatchingDocURLs(tokens);
 		for(String url : URLs){
 			List<Double> doc = index.getDoc(url, docTerms);
 			double similarityValue = calculateSimilarity(doc, queryVector);
-			cosSimMap.put(url, similarityValue);
+			Document document = new Document(url, index.getDocTitle(url), index.getDocSnippet(url));
+			cosSimMap.put(document, similarityValue);
 		}
 		return cosSimMap;
 	}

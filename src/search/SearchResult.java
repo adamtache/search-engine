@@ -18,7 +18,7 @@ import parser.TokenizedData;
  */
 public class SearchResult implements ISearchResult {
 
-	private Map<String, Double> values; // URL -> value
+	private Map<Document, Double> values; // Document (url, title, snippet) -> value
 	private TokenizedData data;
 
 	/**
@@ -26,8 +26,8 @@ public class SearchResult implements ISearchResult {
 	 * 
 	 * @param map2
 	 */
-	public SearchResult(Map<String, Double> map2) {
-		this.values = map2;
+	public SearchResult(Map<Document, Double> map) {
+		this.values = map;
 	}
 
 	/**
@@ -36,8 +36,8 @@ public class SearchResult implements ISearchResult {
 	 * @param url
 	 * @return
 	 */
-	public Double getRelevance(String url) {
-		Double relevance = values.get(url);
+	public Double getRelevance(Document doc) {
+		Double relevance = values.get(doc.getURL());
 		return relevance==null ? 0: relevance;
 	}
 
@@ -48,9 +48,9 @@ public class SearchResult implements ISearchResult {
 	 * @return New ISearchResult object.
 	 */
 	public ISearchResult or(ISearchResult that) {
-		Map<String, Double> orMap = new HashMap<>(values);
-		Set<String> thatTerms = that.getValues().keySet();
-		for(String thatTerm : thatTerms){
+		Map<Document, Double> orMap = new HashMap<>(values);
+		Set<Document> thatTerms = that.getValues().keySet();
+		for(Document thatTerm : thatTerms){
 			orMap.put(thatTerm, totalRelevance(that, thatTerm));
 		}
 		return new SearchResult(orMap);
@@ -63,8 +63,8 @@ public class SearchResult implements ISearchResult {
 	 * @return New ISearchResult object.
 	 */
 	public ISearchResult and(ISearchResult that) {
-		Map<String, Double> andMap = new HashMap<>();
-		for(String thatTerm : that.getValues().keySet()){
+		Map<Document, Double> andMap = new HashMap<>();
+		for(Document thatTerm : that.getValues().keySet()){
 			if(this.values.containsKey(thatTerm)){
 				andMap.put(thatTerm, totalRelevance(that, thatTerm));
 			}
@@ -79,15 +79,15 @@ public class SearchResult implements ISearchResult {
 	 * @return New ISearchResult object.
 	 */
 	public ISearchResult minus(ISearchResult that) {
-		Map<String, Double> minusMap = new HashMap<>(values);
-		for(String thatTerm : that.getValues().keySet()){
+		Map<Document, Double> minusMap = new HashMap<>(values);
+		for(Document thatTerm : that.getValues().keySet()){
 			minusMap.remove(thatTerm);
 		}
 		return new SearchResult(minusMap);
 	}
 
-	private Double totalRelevance(ISearchResult that, String term){
-		return totalRelevance(that.getRelevance(term), this.getRelevance(term));
+	private Double totalRelevance(ISearchResult that, Document thatTerm){
+		return totalRelevance(that.getRelevance(thatTerm), this.getRelevance(thatTerm));
 	}
 
 	/**
@@ -107,9 +107,9 @@ public class SearchResult implements ISearchResult {
 	 * 
 	 * @return List of entries with URL and relevance.
 	 */
-	public List<Entry<String, Double>> getResults() {
-		List<Entry<String, Double>> entries = new ArrayList<>(values.entrySet());
-		Comparator<Entry<String, Double>> comparator = new RelevanceComparator();
+	public List<Entry<Document, Double>> getResults() {
+		List<Entry<Document, Double>> entries = new ArrayList<>(values.entrySet());
+		Comparator<Entry<Document, Double>> comparator = new RelevanceComparator();
 		Collections.sort(entries, comparator);
 		return entries;
 	}
@@ -120,8 +120,8 @@ public class SearchResult implements ISearchResult {
 	
 	public double getNumUrlsWithTerm(String term) {
 		int count = 0;
-		for(String url : values.keySet()){
-			if(values.get(url) > 0){
+		for(Document doc : values.keySet()){
+			if(values.get(doc) > 0){
 				count++;
 			}
 		}
@@ -129,10 +129,10 @@ public class SearchResult implements ISearchResult {
 	}
 
 	public String getUrl(int result) {
-		return this.getResults().get(result).getKey();
+		return this.getResults().get(result).getKey().getURL();
 	}
 	
-	public Map<String, Double> getValues(){
+	public Map<Document, Double> getValues(){
 		return this.values;
 	}
 		
@@ -157,11 +157,11 @@ public class SearchResult implements ISearchResult {
 	}
 	
 	public void print() {
-		List<Entry<String, Double>> entries = getResults();
+		List<Entry<Document, Double>> entries = getResults();
 		if(entries == null){
 			return;
 		}
-		for (Entry<String, Double> entry: entries) {
+		for (Entry<Document, Double> entry: entries) {
 			System.out.println(entry);
 		}
 	}

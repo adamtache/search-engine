@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import fetcher.PageData;
 import fetcher.WikiFetcher;
 import index.IIndex;
 import view.IView;
@@ -32,11 +34,18 @@ public class JedisWikiCrawler {
 	 * @param index2
 	 */
 	public JedisWikiCrawler(IIndex index2, IView view) {
-		this.source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
+		source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
 		this.index = index2;
 		this.myView = view;
 		queue.offer(source);
 		queue.offer("https://en.wikipedia.org/wiki/Claude_Shannon");
+		queue.offer("https://en.wikipedia.org/wiki/Google");
+		queue.offer("https://en.wikipedia.org/wiki/Quantum_mechanics");
+		queue.offer("https://en.wikipedia.org/wiki/Cypress_Bay_High_School");
+		queue.offer("https://en.wikipedia.org/wiki/Burger");
+		queue.offer("https://en.wikipedia.org/wiki/Ice_cream_sandwich");
+		queue.offer("https://en.wikipedia.org/wiki/Rubik%27s_Cube");
+		queue.offer("https://en.wikipedia.org/wiki/Duke_University");
 	}
 
 	/**
@@ -49,39 +58,36 @@ public class JedisWikiCrawler {
 	}
 
 	public void crawl() throws IOException{
-		boolean newPage = false;
 		int count = 0;
 		do {
-			boolean update = this.crawlPage();
-			if(update) newPage = true;
+			this.crawlPage();
 			count ++;
-		} while (count < 2);
-		if(newPage) updateDB();
+		} while (count < 10);
 	}
 
 	/**
 	 * Gets a URL from the queue and indexes it.
 	 * @param b 
 	 * 
-	 * @return Indexed a new page
+	 * @return True of indexed a new page
 	 * @throws IOException
 	 */
 	public boolean crawlPage() throws IOException {
 		if (queue.isEmpty())
 			return false;
 		String crawlURL = queue.poll();
-		myView.updateStatus("Crawler reached " + crawlURL);
-		Elements paragraphs;
+		System.out.println("Crawling " + crawlURL);
+		PageData pageData;
 		if (index.isIndexed(crawlURL)) {
 			myView.updateStatus("Already indexed " + crawlURL);
 			return false;
 		} else {
 			myView.updateStatus("Fetching " + crawlURL);
 			this.updateDB();
-			paragraphs = wf.fetch(crawlURL);
+			pageData = wf.fetch(crawlURL);
 		}
-		index.indexPage(crawlURL, paragraphs);
-		queueInternalLinks(paragraphs);
+		index.indexPage(pageData);
+		//queueInternalLinks(paragraphs);
 		return true;
 	}
 

@@ -10,11 +10,11 @@ public interface ISearchResult {
 
 	public abstract String getUrl(int result);
 
-	public abstract Double getRelevance(String term);
+	public abstract Double getRelevance(Document thatTerm);
 	
-	public abstract Map<String, Double> getValues();
+	public abstract Map<Document, Double> getValues();
 
-	public abstract List<Entry<String, Double>> getResults();
+	public abstract List<Entry<Document, Double>> getResults();
 
 	public abstract ISearchResult and(ISearchResult that);
 

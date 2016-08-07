@@ -1,40 +1,45 @@
 package index;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.jsoup.select.Elements;
+
+import fetcher.PageData;
+import search.Document;
 import search.ISearchResult;
 
 public interface IIndex {
 
-	void storeQuery(String query, ISearchResult result);
+	public abstract void storeQuery(String query, ISearchResult result);
 
-	void indexPage(String crawlURL, Elements paragraphs) throws IOException;
+	public abstract boolean isIndexed(String crawlURL);
 
-	boolean isIndexed(String crawlURL);
+	public abstract void deleteQueryData();
 
-	void deleteQueryData();
+	public abstract Set<String> getDocURLs();
 
-	Set<String> getDocURLs();
+	public abstract String getDocValue(String url, String docTerm);
 
-	String getDocValue(String url, String docTerm);
+	public abstract Map<Document, Double> getValues(String myTerm);
 
-	Map<String, Double> getValues(String myTerm);
+	public abstract void reset();
 
-	void reset();
+	public abstract void addDocumentsToDB();
 
-	void addDocumentsToDB();
+	public abstract Set<String> getDocTerms();
 
-	Set<String> getDocTerms();
+	public abstract boolean hasQueryData(String query);
 
-	boolean hasQueryData(String query);
+	public abstract ISearchResult getQueryResult(String query);
 
-	ISearchResult getQueryResult(String query);
+	public abstract List<Double> getDoc(String url, Set<String> docTerms);
 
-	List<Double> getDoc(String url, Set<String> docTerms);
+	public abstract Set<String> getMatchingDocURLs(List<String> tokens);
 
-	Set<String> getMatchingDocURLs(List<String> tokens);
+	public abstract void indexPage(PageData pageData);
+
+	public abstract String getDocTitle(String url);
+
+	public abstract String getDocSnippet(String url);
 
 }

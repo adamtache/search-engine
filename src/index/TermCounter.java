@@ -1,8 +1,10 @@
 package index;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jsoup.nodes.Node;
@@ -24,8 +26,10 @@ public class TermCounter {
 	private Map<String, Integer> map;
 	private String label;
 	private Set<String> stopWords;
+	private List<String> snippet;
 
 	public TermCounter(String label) throws IOException {
+		this.snippet = new ArrayList<>();
 		this.label = label;
 		this.map = new HashMap<String, Integer>();
 		this.stopWords = new HashSet<>();
@@ -100,6 +104,9 @@ public class TermCounter {
 	 * @param term
 	 */
 	public void incrementTermCount(String term) {
+		if(snippet.size() < 20){
+			snippet.add(term);
+		}
 		if(!isStopWord(term))
 			put(term, get(term) + 1);
 	}
@@ -136,6 +143,14 @@ public class TermCounter {
 	 */
 	public Set<String> keySet() {
 		return map.keySet();
+	}
+	
+	public String getSnippet(){
+		String snippetStr = "";
+		for(String snip : snippet){
+			snippetStr += snip+" ";
+		}
+		return snippetStr;
 	}
 	
 }

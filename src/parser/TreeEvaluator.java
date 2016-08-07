@@ -6,6 +6,7 @@ import java.util.List;
 
 import index.IIndex;
 import parser.nodes.Node;
+import search.Document;
 import search.ISearchResult;
 import search.SearchResult;
 
@@ -13,7 +14,7 @@ public class TreeEvaluator {
 
 	public ISearchResult evaluateRoots(List<Node> roots, IIndex index){
 		EvaluationData ec = new EvaluationData(index);
-		ISearchResult result = new SearchResult(new HashMap<String, Double>());
+		ISearchResult result = new SearchResult(new HashMap<Document, Double>());
 		for(Node root : roots){
 			result = root.evaluate(ec);
 			ec.setLastResult(result);

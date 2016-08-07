@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parser.TokenizedData;
+import search.Document;
 import search.ISearchResult;
 import search.ResultsFactory;
 
@@ -58,14 +59,15 @@ public class SearchResults {
 		if(data.checkCorrectedSpelling()){
 			this.addDidYouMean(data.getTokenizedData());
 		}
-		for(Entry<String,Double> dataEntry: data.getResults()){
+		for(Entry<Document,Double> dataEntry: data.getResults()){
 			this.addResult(dataEntry.getKey());
 		}
 	}
 
-	private void addResult(String resultUrl){
-		Hyperlink resultLink = new Hyperlink(resultUrl);
+	private void addResult(Document doc){
+		Hyperlink resultLink = new Hyperlink(doc.getURL());
 		mySearchResults.getChildren().add(resultLink);
+		// also add doc.getTitle() and doc.getSnippet() to search results
 	}
 
 	private void addDidYouMean(TokenizedData data){

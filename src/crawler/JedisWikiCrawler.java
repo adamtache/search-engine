@@ -12,7 +12,7 @@ import index.IIndex;
 import view.IView;
 
 
-public class JedisWikiCrawler {
+public class JedisWikiCrawler implements Crawler{
 	// keeps track of where we started
 	private final String source;
 
@@ -33,9 +33,9 @@ public class JedisWikiCrawler {
 	 * @param source
 	 * @param index2
 	 */
-	public JedisWikiCrawler(IIndex index2, IView view) {
+	public JedisWikiCrawler(IIndex index, IView view) {
 		source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		this.index = index2;
+		this.index = index;
 		this.myView = view;
 		queue.offer(source);
 		queue.offer("https://en.wikipedia.org/wiki/Claude_Shannon");
@@ -91,10 +91,6 @@ public class JedisWikiCrawler {
 		return true;
 	}
 
-	private void updateDB(){
-		index.deleteQueryData();
-	}
-
 	/**
 	 * Parses paragraphs and adds internal links to the queue.
 	 * 
@@ -110,6 +106,11 @@ public class JedisWikiCrawler {
 				}
 			}
 		}
+	}
+
+	@Override
+	public IIndex getIndex() {
+		return this.index;
 	}
 
 }

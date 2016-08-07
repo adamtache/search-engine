@@ -3,9 +3,11 @@ package controller;
 import java.io.IOException;
 
 import crawler.JedisWikiCrawler;
+import crawler.YouTubeVideoCrawler;
 import index.IIndex;
 import index.JedisMaker;
 import index.WebIndex;
+import index.YouTubeIndex;
 import parser.Parser;
 import search.ISearchResult;
 import search.ResultsFactory;
@@ -27,14 +29,18 @@ public class Controller {
 		this.myParser = new Parser(index);
 	}
 
-	public void initialize(){
-//		System.out.println("RESETTING");
-//		myView.updateStatus("Controller resetting Redis database.");
+	public void initialize() throws IOException{
+		crawlYouTube();
 //		index.reset();
-//		System.out.println("CRAWLING");
 //		crawl();
-//		System.out.println("FINISHED CRAWLING");
 //		index.addDocumentsToDB();
+	}
+	
+	private void crawlYouTube() throws IOException{
+		YouTubeIndex yt = new YouTubeIndex(JedisMaker.make(), myView);
+		YouTubeVideoCrawler ytCrawler = new YouTubeVideoCrawler(index);
+		ytCrawler.crawl();
+		yt.addDocumentsToDB();
 	}
 
 	public ISearchResult getResults(String query) {

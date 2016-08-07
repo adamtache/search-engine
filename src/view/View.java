@@ -25,7 +25,11 @@ public class View implements IView {
 			e.printStackTrace();
 		}
 		myMainScreen = new MainScreen(myController, myWidth, myHeight);
-		myController.initialize();
+		try {
+			myController.initialize();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

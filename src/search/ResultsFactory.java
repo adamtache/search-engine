@@ -15,24 +15,24 @@ import parser.nodes.Node;
 
 public class ResultsFactory {
 
-	public static ISearchResult getSearchResult(TokenizedData tokenizedData){
+	public static ISearchResult getSearchResult(TokenizedData tokenizedData, IIndex index){
 		List<String> tokens = tokenizedData.getTokens();
 		if(isVectorSpaceModel(tokens)){
-			return getVectorModelData(tokens, tokenizedData.getIndex());
+			return getVectorModelData(tokens, index);
 		}
 		// Boolean model
-		List<Node> roots = new TreeFactory(tokenizedData.getIndex()).createRoot(tokens);
-		return getData(roots, tokenizedData);
+		List<Node> roots = new TreeFactory(index).createRoot(tokens);
+		return getData(roots, tokenizedData, index);
 	}
 
-	public static ISearchResult getSpellCorrectedResult(TokenizedData tokenizedData){
+	public static ISearchResult getSpellCorrectedResult(TokenizedData tokenizedData, IIndex index){
 		List<String> correctedTokens = tokenizedData.getSpellCorrected();
 		if(isVectorSpaceModel(correctedTokens)){
-			return getVectorModelData(correctedTokens, tokenizedData.getIndex());
+			return getVectorModelData(correctedTokens, index);
 		}
 		// Boolean model
-		List<Node> correctedRoots = new TreeFactory(tokenizedData.getIndex()).createRoot(correctedTokens);
-		return getData(correctedRoots, tokenizedData);
+		List<Node> correctedRoots = new TreeFactory(index).createRoot(correctedTokens);
+		return getData(correctedRoots, tokenizedData, index);
 	}
 
 	private static ISearchResult getVectorModelData(List<String> tokens, IIndex index){
@@ -143,8 +143,8 @@ public class ResultsFactory {
 		return false;
 	}
 
-	private static ISearchResult getData(List<Node> roots, TokenizedData tokenizedData){
-		ISearchResult data = evaluateRoots(roots, tokenizedData.getIndex());
+	private static ISearchResult getData(List<Node> roots, TokenizedData tokenizedData, IIndex index){
+		ISearchResult data = evaluateRoots(roots, index);
 		if(data != null)
 			data.setTokenizedData(tokenizedData);
 		return data;

@@ -1,8 +1,7 @@
 package view;
 
-import java.util.List;
 import java.util.Map.Entry;
-
+import controller.Controller;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -13,7 +12,6 @@ import javafx.scene.layout.VBox;
 import parser.TokenizedData;
 import search.Document;
 import search.ISearchResult;
-import search.ResultsFactory;
 
 public class SearchResults {
 	
@@ -22,9 +20,10 @@ public class SearchResults {
 	private VBox mySearchResults;
 	private StackPane myResultPane;
 	private Button didYouMeanButton;
-	private ISearchResult data;
+	private Controller myController;
 
-	public SearchResults(StackPane resultPane){
+	public SearchResults(StackPane resultPane, Controller controller){
+		this.myController = controller;
 		this.myResultPane = resultPane;
 		initialize();
 	}
@@ -42,23 +41,21 @@ public class SearchResults {
 		myRoot.getChildren().add(mySearchResults);
 	}
 	
-	private void didYouKnowButton(){
-		TokenizedData tokenizedData = data.getTokenizedData();
-		List<String> spellCorrected = tokenizedData.getSpellCorrected();
-		this.didYouMeanButton = new Button("Did You Mean? " + spellCorrected);
+	private void didYouMeanButton(){
+		this.didYouMeanButton = new Button("Did You Mean? " + myController.getSpellCorrected());
 		this.didYouMeanButton.setOnAction(event -> {
-			this.display(ResultsFactory.getSpellCorrectedResult(tokenizedData));
+			myController.displaySpellCorrected();
 		});
 		mySearchResults.getChildren().add(didYouMeanButton);
 	}
 
 	public void display(ISearchResult data) {
-		this.data = data;
 		myResultPane.getChildren().clear();
 		myResultPane.getChildren().add(myRoot);
 		if(data.checkCorrectedSpelling()){
 			this.addDidYouMean(data.getTokenizedData());
 		}
+		System.out.println(data.getValues());
 		for(Entry<Document,Double> dataEntry: data.getResults()){
 			this.addResult(dataEntry.getKey());
 		}
@@ -71,7 +68,7 @@ public class SearchResults {
 	}
 
 	private void addDidYouMean(TokenizedData data){
-		didYouKnowButton();
+		didYouMeanButton();
 	}
 	
 }

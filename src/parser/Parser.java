@@ -9,11 +9,10 @@ import index.IIndex;
 
 public class Parser {
 
-	private EvaluationData myController;
 	private SpellChecker mySpellChecker;
+	private IIndex myIndex;
 
-	public Parser(IIndex index){
-		this.myController = new EvaluationData(index);
+	public Parser(){
 		this.mySpellChecker = new SpellChecker();
 	}
 
@@ -32,7 +31,7 @@ public class Parser {
 			}
 		}
 		List<String> spellCorrected = this.correctSpelling(tokens);
-		return new TokenizedData(tokens, spellCorrected, myController.getIndex());
+		return new TokenizedData(tokens, spellCorrected, myIndex);
 	}
 
 	private List<String> correctSpelling(List<String> tokens){

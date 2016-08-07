@@ -39,7 +39,7 @@ public abstract class CommandNode implements Node {
     }
     
     public Parser getParser(){
-    	return new Parser(this.myEvaluationController.getIndex());
+    	return new Parser();
     }
 
     /**

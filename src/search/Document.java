@@ -24,4 +24,8 @@ public class Document {
 		return this.snippet;
 	}
 	
+	public String toString(){
+		return title+" "+url;
+	}
+	
 }

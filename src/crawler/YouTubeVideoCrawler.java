@@ -48,7 +48,7 @@ public class YouTubeVideoCrawler implements Crawler{
 		do {
 			this.crawlPage();
 			count ++;
-		} while (count < 50);
+		} while (count < 1);
 	}
 
 	/**
@@ -62,7 +62,6 @@ public class YouTubeVideoCrawler implements Crawler{
 		if (queue.isEmpty())
 			return false;
 		String crawlURL = queue.poll();
-		System.out.println("CRAWLING: " + crawlURL);
 		PageData pageData;
 		if (index.isIndexed(crawlURL)) {
 			return false;
@@ -70,7 +69,7 @@ public class YouTubeVideoCrawler implements Crawler{
 			this.updateDB();
 			pageData = yf.fetch(crawlURL);
 		}
-		//index.indexPage(pageData);
+		index.indexPage(pageData);
 		queueInternalLinks(((YouTubeData) pageData).getYouTubeParas());
 		return true;
 	}

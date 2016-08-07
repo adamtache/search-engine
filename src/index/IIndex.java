@@ -41,7 +41,7 @@ public interface IIndex {
 	public abstract String getDocTitle(String url);
 
 	public abstract String getDocSnippet(String url);
-
-	String urlSetKey(String term);
+	
+	public abstract void deleteDocData();
 
 }

@@ -24,9 +24,7 @@ public class WikiFetcher extends Fetcher{
 		// select the content text and pull out the paragraphs.
 		Element content = doc.getElementById("mw-content-text");
 
-		// TODO: avoid selecting paragraphs from sidebars and boxouts
 		Elements paras = content.select("p");
-		Elements title = content.select("title");
 		
 		return new PageData(url, super.getTitle(doc), paras);
 	}

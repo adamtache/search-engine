@@ -20,6 +20,7 @@ public class SearchBar {
 	private static final int HBOX_PADDING = 20;
 	private TextField textField;
 	private Button searchButton;
+	private Button ytSearchButton;
 	private Button feelingLuckyButton;
 	private Controller myController;
 	private HBox myRoot;
@@ -39,8 +40,9 @@ public class SearchBar {
 		this.textField.setPrefWidth(SEARCH_BAR_WIDTH);
 		this.bar = new ProgressBar();
 		setupSearchButton(searchButton);
+		setupYTSearchButton(ytSearchButton);
 		setupFeelingLuckyButton(feelingLuckyButton);
-		myRoot.getChildren().addAll(textField, searchButton, feelingLuckyButton);
+		myRoot.getChildren().addAll(textField, searchButton, feelingLuckyButton, ytSearchButton);
 	}
 	
 	private HBox makeHbox() {
@@ -54,14 +56,22 @@ public class SearchBar {
 		this.searchButton = new Button("Search");
 		this.searchButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Search started.");
-			runDisplay(false);
+			runDisplay(false, false);
 		});
 	}
 	
-	private void runDisplay(boolean isLucky){
+	private void setupYTSearchButton(Button searchButton) {
+		this.ytSearchButton = new Button("Search YouTube");
+		this.ytSearchButton.setOnAction(event -> {
+			myMainScreen.updateStatus("YouTube Search started.");
+			runDisplay(false, true);
+		});
+	}
+	
+	private void runDisplay(boolean isLucky, boolean youtube){
 		Task<Void> task = createTask(new Callable<Void>() {
 			public Void call(){
-				ISearchResult result = myController.getResults(getSearchQuery());
+				ISearchResult result = youtube ? myController.getYTResults(getSearchQuery()) : myController.getResults(getSearchQuery());
 				if(isLucky) myController.goToLucky(result);
 				else myController.display(result);
 				return null;
@@ -78,10 +88,9 @@ public class SearchBar {
 		this.feelingLuckyButton = new Button("Feeling lucky?");
 		this.feelingLuckyButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Lucky search started.");
-			runDisplay(true);
+			runDisplay(true, false);
 		});
 	}
-	
 	
 	private Task<Void> createTask(Callable<Void> myFunc){
 		Task<Void> task = new Task<Void> () {

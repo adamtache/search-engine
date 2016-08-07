@@ -31,7 +31,7 @@ public abstract class JedisIndex implements IIndex {
 	 */
 	public JedisIndex(Jedis jedis, IView view) {
 		this.jedis = jedis;
-		this.myView = view;
+		myView = view;
 	}
 
 	public abstract String urlSetKey(String term);
@@ -46,7 +46,7 @@ public abstract class JedisIndex implements IIndex {
 	public abstract Set<String> urlSetKeys();
 	public abstract String docTermsKey();
 	public abstract Set<String> termCounterKeys();
-	
+
 	public Long numberIndexedPages(){
 		return jedis.scard(urlKey());
 	}
@@ -137,7 +137,7 @@ public abstract class JedisIndex implements IIndex {
 		String url = tc.getLabel();
 		t.sadd(urlKey(), url); // Add URL to list of URLs indexed.
 		String hashname = termCounterKey(url);
-		
+
 		String snippet = tc.getSnippet();
 		t.set(titleKey(url), title); // Add title of URL to DB.
 		t.set(snippetKey(url), snippet); // Add snippet of URL to DB.
@@ -156,22 +156,22 @@ public abstract class JedisIndex implements IIndex {
 
 	@Override
 	public Set<String> getDocURLs(){
-		return jedis.smembers(this.urlKey());
+		return jedis.smembers(urlKey());
 	}
 
 	@Override
 	public Set<String> getDocTerms(){
-		return jedis.smembers(this.docTermsKey());
+		return jedis.smembers(docTermsKey());
 	}
 
 	@Override
 	public void addDocumentsToDB() {
-		this.deleteDocData();
-		Set<String> docURLs = this.getDocURLs();
-		Set<String> terms = this.getDocTerms();
+		deleteDocData();
+		Set<String> docURLs = getDocURLs();
+		Set<String> terms = getDocTerms();
 		for(String url : docURLs){
 			for(String term : terms){
-				double tfIdf = this.tfIdf(url, term);
+				double tfIdf = tfIdf(url, term);
 				String tfIdfStr = tfIdf + "";
 				Transaction t = jedis.multi();
 				t.set(getValueKey(url, term), tfIdfStr);
@@ -192,7 +192,7 @@ public abstract class JedisIndex implements IIndex {
 		Map<Document, Double> results = new HashMap<Document, Double>();
 		for(String url : getURLs(term)){
 			myView.updateStatus("Calculating TFIDF for " + term+" for URL: " + url);
-			double tfIdf = this.tfIdf(url, term);
+			double tfIdf = tfIdf(url, term);
 			myView.updateStatus("TFIDF: " + tfIdf);
 			results.put(getDocument(url), tfIdf);
 		}
@@ -200,17 +200,17 @@ public abstract class JedisIndex implements IIndex {
 	}
 
 	private Document getDocument(String url){
-		return new Document(url, this.getDocTitle(url), this.getDocSnippet(url));
+		return new Document(url, getDocTitle(url), getDocSnippet(url));
 	}
 
 	private Double tfIdf(String url, String term){
 		double tf = getCount(url, term);
 		myView.updateStatus("Index determined TF to be: "+tf+".");
-		return tf * this.idf(term);
+		return tf * idf(term);
 	}
 
 	private Double idf(String term){
-		Long numDocuments = this.numberIndexedPages();
+		Long numDocuments = numberIndexedPages();
 		Long documentFrequency = jedis.scard(urlSetKey(term));
 		return 1 + Math.log((double) numDocuments/documentFrequency);
 	}
@@ -226,7 +226,7 @@ public abstract class JedisIndex implements IIndex {
 		Map<Document, Double> results = result.getValues();
 		for(Document doc : results.keySet()){
 			String url = doc.getURL();
-			jedis.hset(this.queryKey(query), url, results.get(url)+"");
+			jedis.hset(queryKey(query), url, results.get(url)+"");
 		}
 	}
 
@@ -277,7 +277,7 @@ public abstract class JedisIndex implements IIndex {
 		}
 		t.exec();
 	}
-	
+
 	/**
 	 * Returns the Redis key for a URL's title.
 	 * 
@@ -286,7 +286,7 @@ public abstract class JedisIndex implements IIndex {
 	private String titleKey(String url) {
 		return "Title:" + url;
 	}
-	
+
 	/**
 	 * Returns the Redis key for a URL's snippet.
 	 * 
@@ -297,11 +297,11 @@ public abstract class JedisIndex implements IIndex {
 	}
 
 	public void reset() {
-		this.deleteAllKeys();
-		this.deleteTermCounters();
-		this.deleteURLSets();
-		this.deleteQueryData();
-		this.deleteDocData();
+		deleteAllKeys();
+		deleteTermCounters();
+		deleteURLSets();
+		deleteQueryData();
+		deleteDocData();
 	}
 
 	@Override
@@ -332,7 +332,7 @@ public abstract class JedisIndex implements IIndex {
 
 	@Override
 	public Set<String> getMatchingDocURLs(List<String> tokens) {
-		Set<String> docURLs = jedis.smembers(this.urlKey());
+		Set<String> docURLs = jedis.smembers(urlKey());
 		Set<String> matches = new HashSet<>();
 		for(String url : docURLs){
 			boolean match = false;

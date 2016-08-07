@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import crawler.JedisWikiCrawler;
 import crawler.YouTubeVideoCrawler;
@@ -17,41 +18,37 @@ public class Controller {
 
 	private IView myView;
 	private JedisWikiCrawler crawler;
-	private IIndex index;
+	private IIndex webIndex;
+	private IIndex ytIndex;
 	private Parser myParser;
-	private ISearchResult myCurrentResult;
+	private ISearchResult myLastResult;
 
 	public Controller(IView view) throws IOException {
 		this.myView = view;
 		new JedisMaker();
-		this.index = new WebIndex(JedisMaker.make(), myView);
-		this.crawler = new JedisWikiCrawler(index, view);
-		this.myParser = new Parser(index);
+		this.webIndex = new WebIndex(JedisMaker.make(), myView);
+		this.ytIndex = new YouTubeIndex(JedisMaker.make(), myView);
+		this.crawler = new JedisWikiCrawler(webIndex, view);
+		this.myParser = new Parser();
 	}
 
 	public void initialize() throws IOException{
-		crawlYouTube();
-//		index.reset();
-//		crawl();
-//		index.addDocumentsToDB();
+		// index.reset();
+		setupYouTubeSearch();
+//		setupWebSearch();
 	}
 	
-	private void crawlYouTube() throws IOException{
-		YouTubeIndex yt = new YouTubeIndex(JedisMaker.make(), myView);
-		YouTubeVideoCrawler ytCrawler = new YouTubeVideoCrawler(index);
-		ytCrawler.crawl();
-		yt.addDocumentsToDB();
+	private void setupWebSearch() throws IOException{
+		crawl();
+		webIndex.addDocumentsToDB();
 	}
-
-	public ISearchResult getResults(String query) {
-		myView.updateStatus("Controller obtaining search results.");
-		if(index.hasQueryData(query)){
-			return index.getQueryResult(query);
-		}
-		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query));
-		this.index.storeQuery(query, result);
-		this.myCurrentResult = result;
-		return result;
+	
+	private void setupYouTubeSearch() throws IOException{
+		ytIndex.deleteDocData();
+		YouTubeVideoCrawler ytCrawler = new YouTubeVideoCrawler(ytIndex);
+		ytCrawler.crawl();
+		ytIndex.addDocumentsToDB();
+		System.out.println("HERE");
 	}
 
 	private void crawl() {
@@ -73,9 +70,44 @@ public class Controller {
 		myView.updateStatus("Controller initializing display of page.");
 		myView.display(result.getUrl(0));
 	}
+	
+	public ISearchResult getResults(String query) {
+		myView.updateStatus("Controller obtaining search results.");
+		if(webIndex.hasQueryData(query)){
+			return webIndex.getQueryResult(query);
+		}
+		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query), webIndex);
+		this.webIndex.storeQuery(query, result);
+		this.myLastResult = result;
+		return result;
+	}
+	
+	public ISearchResult getYTResults(String query) {
+		myView.updateStatus("Controller obtaining search results.");
+		if(ytIndex.hasQueryData(query)){
+			return ytIndex.getQueryResult(query);
+		}
+		ISearchResult result = ResultsFactory.getSearchResult(myParser.tokenize(query), ytIndex);
+		this.ytIndex.storeQuery(query, result);
+		this.myLastResult = result;
+		return result;
+	}
 
 	public String getLuckyResult() {
-		return myCurrentResult.getUrl(0);
+		return myLastResult.getUrl(0);
+	}
+
+	public String getSpellCorrected() {
+		String spellCorrected = "";
+		List<String> corrected = myLastResult.getTokenizedData().getSpellCorrected();
+		for(int x=0; x<corrected.size(); x++){
+			spellCorrected+=corrected+" ";
+		}
+		return spellCorrected;
+	}
+
+	public void displaySpellCorrected() {
+		display(getResults(getSpellCorrected()));
 	}
 
 }

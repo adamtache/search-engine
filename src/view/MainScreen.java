@@ -33,7 +33,7 @@ public class MainScreen implements IScreen {
 		mySearchBar = new SearchBar(myController, this);
 		myResultPane = new StackPane();
 		myWebBrowser = new WebBrowser(myResultPane);
-		mySearchResult = new SearchResults(myResultPane);
+		mySearchResult = new SearchResults(myResultPane, myController);
 		myResultPane.getChildren().add(mySearchResult.getNode());
 		setBorderPaneSections();
 		myScene = new Scene(myRoot, myWidth, myHeight);

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import crawler.JedisWikiCrawler;
 import index.IIndex;
-import index.JedisIndex;
 import index.JedisMaker;
+import index.WebIndex;
 import parser.Parser;
 import search.ISearchResult;
 import search.ResultsFactory;
@@ -22,7 +22,7 @@ public class Controller {
 	public Controller(IView view) throws IOException {
 		this.myView = view;
 		new JedisMaker();
-		this.index = new JedisIndex(JedisMaker.make(), myView);
+		this.index = new WebIndex(JedisMaker.make(), myView);
 		this.crawler = new JedisWikiCrawler(index, view);
 		this.myParser = new Parser(index);
 	}

@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import org.jsoup.select.Elements;
-
 import fetcher.PageData;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
@@ -21,9 +19,9 @@ import view.IView;
  * Represents a Redis-backed web search index.
  * 
  */
-public class JedisIndex implements IIndex {
+public abstract class JedisIndex implements IIndex {
 
-	private Jedis jedis;
+	protected Jedis jedis;
 	private IView myView;
 
 	/**
@@ -36,94 +34,25 @@ public class JedisIndex implements IIndex {
 		this.myView = view;
 	}
 
-	/**
-	 * Returns the Redis key for a given search term.
-	 * 
-	 * @return Redis key.
-	 */
-	private String urlSetKey(String term) {
-		return "URLSet:" + term;
-	}
-
-	/**
-	 * Returns the Redis key for a given search term.
-	 * 
-	 * @return Redis key.
-	 */
-	private String getValueKey(String url, String term) {
-		return "Value:" + url+term;
-	}
-
-	/**
-	 * Returns the Redis key for a given document
-	 * 
-	 * @return Redis key.
-	 */
-	private String getDocKey(String url) {
-		return "Doc:" + url;
-	}
-
-	/**
-	 * Returns the Redis key for a given document's values
-	 * 
-	 * @return Redis key.
-	 */
-	private String getDocValuesKey(String url) {
-		return "DocValues:" + url;
-	}
-
-	/**
-	 * Returns the Redis key for query results.
-	 * @param query 
-	 * 
-	 * @return Redis key.
-	 */
-	private String queryKey(String query) {
-		return "Query"+query;
-	}
-
-	/**
-	 * Returns the Redis key to access Set of URLs indexed.
-	 * 
-	 * @return Redis key.
-	 */
-	private String urlKey() {
-		return "IndexedURLs";
-	}
-
+	public abstract String urlSetKey(String term);
+	public abstract String getValueKey(String url, String term);
+	public abstract String getDocKey(String url);
+	public abstract String getDocValuesKey(String url);
+	public abstract String queryKey(String query);
+	public abstract String urlKey();
+	public abstract String termCounterKey(String url);
+	public abstract void deleteQueryData();
+	public abstract void deleteDocData();
+	public abstract Set<String> urlSetKeys();
+	public abstract String docTermsKey();
+	public abstract Set<String> termCounterKeys();
+	
 	public Long numberIndexedPages(){
 		return jedis.scard(urlKey());
 	}
 
 	public Set<String> indexedPages(){
 		return jedis.smembers(urlKey());
-	}
-
-	/**
-	 * Returns the Redis key for a URL's TermCounter.
-	 * 
-	 * @return Redis key.
-	 */
-	private String termCounterKey(String url) {
-		return "TermCounter:" + url;
-	}
-	
-	/**
-	 * Returns the Redis key for a URL's title.
-	 * 
-	 * @return Redis key.
-	 */
-	private String titleKey(String url) {
-		return "Title:" + url;
-	}
-	
-	/**
-	 * Returns the Redis key for a URL's snippet.
-	 * 
-	 * @return Redis key.
-	 */
-	private String snippetKey(String url) {
-		return "Snippet:" + url;
 	}
 
 	/**
@@ -225,72 +154,6 @@ public class JedisIndex implements IIndex {
 		return res;
 	}
 
-	/**
-	 * Deletes all query data from the database.
-	 * 
-	 * Called by crawler when new pages are crawled to delete old data.
-	 * 
-	 * @return
-	 */
-	public void deleteQueryData() {
-		Set<String> keys = jedis.keys("Query*");
-		Transaction t = jedis.multi();
-		for (String key: keys) {
-			t.del(key);
-		}
-		t.exec();
-	}
-
-	/**
-	 * Deletes all query data from the database.
-	 * 
-	 * Called by controller when new pages are crawled to delete old data.
-	 * 
-	 * @return
-	 */
-	private void deleteDocData() {
-		Set<String> keys = jedis.keys("Doc:*");
-		keys.remove("Doc:https://en.wikipedia.org/wiki/Claude_Shannon");
-		keys.addAll(jedis.keys("DocValues:*"));
-		Transaction t = jedis.multi();
-		for (String key: keys) {
-			t.del(key);
-		}
-		t.exec();
-	}
-
-	/**
-	 * Returns URLSet keys for the terms that have been indexed.
-	 * 
-	 * Should be used for development and testing, not production.
-	 * 
-	 * @return
-	 */
-	public Set<String> urlSetKeys() {
-		return jedis.keys("URLSet:*");
-	}
-
-	/**
-	 * Returns doc terms keys for the set of terms that have been indexed.
-	 * 
-	 * 
-	 * @return
-	 */
-	public String docTermsKey() {
-		return "DocTerms";
-	}
-
-	/**
-	 * Returns TermCounter keys for the URLS that have been indexed.
-	 * 
-	 * Should be used for development and testing, not production.
-	 * 
-	 * @return
-	 */
-	public Set<String> termCounterKeys() {
-		return jedis.keys("TermCounter:*");
-	}
-
 	@Override
 	public Set<String> getDocURLs(){
 		return jedis.smembers(this.urlKey());
@@ -305,21 +168,13 @@ public class JedisIndex implements IIndex {
 	public void addDocumentsToDB() {
 		this.deleteDocData();
 		Set<String> docURLs = this.getDocURLs();
-		docURLs.remove("https://en.wikipedia.org/wiki/Claude_Shannon");
 		Set<String> terms = this.getDocTerms();
 		for(String url : docURLs){
-			System.out.println("Adding document: " + url);
 			for(String term : terms){
 				double tfIdf = this.tfIdf(url, term);
 				String tfIdfStr = tfIdf + "";
-				String dbLookup = jedis.get(getValueKey(url, term));
-				if(dbLookup != null){
-					tfIdf = Double.parseDouble(dbLookup);
-				}
-				else{
-					jedis.set(getValueKey(url, term), tfIdfStr);
-				}
 				Transaction t = jedis.multi();
+				t.set(getValueKey(url, term), tfIdfStr);
 				t.hset(getDocKey(url), term, tfIdfStr); // Adds term and TF-IDF to URL.
 				t.rpush(getDocValuesKey(url), tfIdfStr); // Adds TF-IDF to document value list.
 				t.exec();
@@ -421,6 +276,24 @@ public class JedisIndex implements IIndex {
 			t.del(key);
 		}
 		t.exec();
+	}
+	
+	/**
+	 * Returns the Redis key for a URL's title.
+	 * 
+	 * @return Redis key.
+	 */
+	private String titleKey(String url) {
+		return "Title:" + url;
+	}
+	
+	/**
+	 * Returns the Redis key for a URL's snippet.
+	 * 
+	 * @return Redis key.
+	 */
+	private String snippetKey(String url) {
+		return "Snippet:" + url;
 	}
 
 	public void reset() {

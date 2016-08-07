@@ -42,4 +42,6 @@ public interface IIndex {
 
 	public abstract String getDocSnippet(String url);
 
+	String urlSetKey(String term);
+
 }

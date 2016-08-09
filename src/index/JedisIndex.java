@@ -168,14 +168,14 @@ public abstract class JedisIndex implements IIndex {
 
 	@Override
 	public void addDocumentsToDB() {
-//		deleteDocData();
+		//		deleteDocData();
 		Set<String> docURLs = getDocURLs();
 		Set<String> corpusTerms = getCorpusTerms();
 		List<String> urls = new ArrayList<>(); urls.add("https://en.wikipedia.org/wiki/Quantum_mechanics"); urls.add("https://en.wikipedia.org/wiki/Claude_Shannon"); urls.add("https://en.wikipedia.org/wiki/Google");
 		for(String url : docURLs){
 			if(urls.contains(url)){
 				for(String term : corpusTerms){
-//					System.out.println(term+" " + url);
+					//					System.out.println(term+" " + url);
 					double tfIdf = 0;
 					if(getCount(url, term) != 0){
 						tfIdf = tfIdf(url, term);
@@ -328,6 +328,8 @@ public abstract class JedisIndex implements IIndex {
 		Set<String> URLs = jedis.hkeys(queryKey(query));
 		for(String url : URLs){
 			String value = jedis.hget(queryKey(query), url);
+			if(value == null || value.equals("null") || value.equals(""))
+				break;
 			queryMap.put(getDocument(url), Double.parseDouble(value));
 		}
 		return new SearchResult(queryMap);

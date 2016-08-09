@@ -1,10 +1,9 @@
 package view;
 
-import java.util.concurrent.Callable;
 import controller.Controller;
 import javafx.scene.control.Button;
 import search.ISearchResult;
-import javafx.concurrent.Task;
+import javafx.application.Platform;
 
 public class MainSearchBar extends SearchBar{
 
@@ -23,16 +22,13 @@ public class MainSearchBar extends SearchBar{
 	
 	@Override
 	protected void runDisplay(boolean isLucky){
-		Task<Void> task = createTask(new Callable<Void>() {
-			public Void call(){
-				ISearchResult result = myController.getResults(getSearchQuery());
-				if(isLucky) myController.goToLucky(result);
-				else myController.display(result);
-				return null;
-			}
-		}); 
-		new Thread(task).start();
-		task.setOnSucceeded(event -> {
+		ISearchResult result = myController.getResults(getSearchQuery());
+		if(isLucky) myController.goToLucky(result);
+		else myController.display(result);
+		Platform.runLater( () -> {
+//			ISearchResult result = myController.getResults(getSearchQuery());
+//			if(isLucky) myController.goToLucky(result);
+//			else myController.display(result);
 			myMainScreen.updateStatus("Finished displaying. Done.");
 			myRoot.getChildren().remove(bar);
 		});

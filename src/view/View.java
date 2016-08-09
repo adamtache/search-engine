@@ -4,6 +4,7 @@ import java.io.IOException;
 import controller.Controller;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import search.ISearchResult;
 
 public class View implements IView {
@@ -34,6 +35,7 @@ public class View implements IView {
 		myBooleanScreen = new BooleanScreen(myController, myWidth);
 		myYouTubeScreen = new YouTubeScreen(myController, myWidth);
 		myTabPane = new TabPane();
+		myTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 		myTabPane.getTabs().addAll(myMainScreen.getTab(), myBooleanScreen.getTab(), myYouTubeScreen.getTab());
 		myScene = new Scene(myTabPane, myWidth, myHeight);
 		myScene.getStylesheets().add("resources/searchengine.css");

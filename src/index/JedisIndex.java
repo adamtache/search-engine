@@ -168,22 +168,25 @@ public abstract class JedisIndex implements IIndex {
 
 	@Override
 	public void addDocumentsToDB() {
-		deleteDocData();
+//		deleteDocData();
 		Set<String> docURLs = getDocURLs();
 		Set<String> corpusTerms = getCorpusTerms();
+		List<String> urls = new ArrayList<>(); urls.add("https://en.wikipedia.org/wiki/Quantum_mechanics"); urls.add("https://en.wikipedia.org/wiki/Claude_Shannon"); urls.add("https://en.wikipedia.org/wiki/Google");
 		for(String url : docURLs){
-			for(String term : corpusTerms){
-				System.out.println(term+" " + url);
-				double tfIdf = 0;
-				if(getCount(url, term) != 0){
-					tfIdf = tfIdf(url, term);
+			if(urls.contains(url)){
+				for(String term : corpusTerms){
+//					System.out.println(term+" " + url);
+					double tfIdf = 0;
+					if(getCount(url, term) != 0){
+						tfIdf = tfIdf(url, term);
+					}
+					String tfIdfStr = tfIdf + "";
+					Transaction t = jedis.multi();
+					t.set(getValueKey(url, term), tfIdfStr);
+					t.hset(getDocKey(url), term, tfIdfStr); // Adds term and TF-IDF to URL.
+					t.rpush(getDocValuesKey(url), tfIdfStr); // Adds TF-IDF to document value list.
+					t.exec();
 				}
-				String tfIdfStr = tfIdf + "";
-				Transaction t = jedis.multi();
-				t.set(getValueKey(url, term), tfIdfStr);
-				t.hset(getDocKey(url), term, tfIdfStr); // Adds term and TF-IDF to URL.
-				t.rpush(getDocValuesKey(url), tfIdfStr); // Adds TF-IDF to document value list.
-				t.exec();
 			}
 		}
 	}

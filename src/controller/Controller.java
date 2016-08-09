@@ -33,7 +33,7 @@ public class Controller {
 	}
 
 	public void initialize() throws IOException{
-		setupWebSearch();
+//		setupWebSearch();
 //		setupYouTubeSearch();
 		// index.reset();
 	}

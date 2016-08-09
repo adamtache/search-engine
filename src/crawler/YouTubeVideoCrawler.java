@@ -48,7 +48,7 @@ public class YouTubeVideoCrawler implements Crawler{
 		do {
 			this.crawlPage();
 			count ++;
-		} while (count < 1);
+		} while (count < 20);
 	}
 
 	/**

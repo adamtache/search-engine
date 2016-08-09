@@ -62,9 +62,11 @@ public class SearchResults {
 	}
 
 	private void addResult(Document doc){
+		Label title = new Label(doc.getTitle());
 		Hyperlink resultLink = new Hyperlink(doc.getURL());
-		mySearchResults.getChildren().add(resultLink);
-		// also add doc.getTitle() and doc.getSnippet() to search results
+		Label snippet = new Label(doc.getSnippet());
+		snippet.getStylesheets().add("resources/snippet.css");
+		mySearchResults.getChildren().addAll(title,resultLink,snippet);
 	}
 
 	private void addDidYouMean(TokenizedData data){

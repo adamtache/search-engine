@@ -41,11 +41,11 @@ public class JedisWikiCrawler implements Crawler{
 		queue.offer("https://en.wikipedia.org/wiki/Claude_Shannon");
 		queue.offer("https://en.wikipedia.org/wiki/Google");
 		queue.offer("https://en.wikipedia.org/wiki/Quantum_mechanics");
-		queue.offer("https://en.wikipedia.org/wiki/Cypress_Bay_High_School");
-		queue.offer("https://en.wikipedia.org/wiki/Burger");
-		queue.offer("https://en.wikipedia.org/wiki/Ice_cream_sandwich");
-		queue.offer("https://en.wikipedia.org/wiki/Rubik%27s_Cube");
-		queue.offer("https://en.wikipedia.org/wiki/Duke_University");
+		queue.offer("https://en.wikipedia.org/wiki/High_Technology_High_School");
+//		queue.offer("https://en.wikipedia.org/wiki/Burger");
+//		queue.offer("https://en.wikipedia.org/wiki/Ice_cream_sandwich");
+//		queue.offer("https://en.wikipedia.org/wiki/Rubik%27s_Cube");
+//		queue.offer("https://en.wikipedia.org/wiki/Duke_University");
 	}
 
 	/**

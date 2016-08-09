@@ -1,8 +1,6 @@
 package view;
 
-import java.util.concurrent.Callable;
 import controller.Controller;
-import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -59,25 +57,6 @@ public abstract class SearchBar {
 			myMainScreen.updateStatus("Lucky search started.");
 			runDisplay(true);
 		});
-	}
-	
-	protected Task<Void> createTask(Callable<Void> myFunc){
-		Task<Void> task = new Task<Void> () {
-			@Override
-			public Void call(){
-				try {
-					myFunc.call();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		};
-		bar.progressProperty().bind(task.progressProperty());
-		if(!myRoot.getChildren().contains(bar)){
-			myRoot.getChildren().add(bar);
-		}
-		return task;
 	}
 	
 	public String getSearchQuery() {

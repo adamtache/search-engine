@@ -54,10 +54,6 @@ public abstract class JedisIndex implements IIndex {
 		return jedis.scard(urlKey());
 	}
 
-	private Response<Long> numberIndexedPages(Transaction t){
-		return t.scard(urlKey());
-	}
-
 	public Set<String> indexedPages(){
 		return jedis.smembers(urlKey());
 	}

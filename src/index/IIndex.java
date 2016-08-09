@@ -8,6 +8,10 @@ import fetcher.PageData;
 import search.Document;
 import search.ISearchResult;
 
+/**
+ * This class represents any index and useful methods for setting up an index that can store/retrieve/create data for searches.
+ * 
+ */
 public interface IIndex {
 
 	public abstract void storeQuery(String query, ISearchResult result);
@@ -26,8 +30,6 @@ public interface IIndex {
 
 	public abstract void addDocumentsToDB();
 
-	public abstract Set<String> getDocTerms();
-
 	public abstract boolean hasQueryData(String query);
 
 	public abstract ISearchResult getQueryResult(String query);
@@ -43,5 +45,7 @@ public interface IIndex {
 	public abstract String getDocSnippet(String url);
 	
 	public abstract void deleteDocData();
+
+	public abstract Set<String> getCorpusTerms();
 
 }

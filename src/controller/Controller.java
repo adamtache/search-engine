@@ -33,13 +33,13 @@ public class Controller {
 	}
 
 	public void initialize() throws IOException{
-		// index.reset();
-		setupYouTubeSearch();
-//		setupWebSearch();
+		setupWebSearch();
+//		setupYouTubeSearch();
 	}
 	
 	private void setupWebSearch() throws IOException{
-		crawl();
+//		webIndex.reset();
+//		crawl();
 		webIndex.addDocumentsToDB();
 	}
 	
@@ -48,7 +48,6 @@ public class Controller {
 		YouTubeVideoCrawler ytCrawler = new YouTubeVideoCrawler(ytIndex);
 		ytCrawler.crawl();
 		ytIndex.addDocumentsToDB();
-		System.out.println("HERE");
 	}
 
 	private void crawl() {

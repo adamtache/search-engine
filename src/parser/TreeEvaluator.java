@@ -10,6 +10,10 @@ import search.Document;
 import search.ISearchResult;
 import search.SearchResult;
 
+/**
+ * This class is used to evaluate abstract syntax trees of roots. Used for evaluation of boolean and grouped commands.
+ * 
+ */
 public class TreeEvaluator {
 
 	public ISearchResult evaluateRoots(List<Node> roots, IIndex index){

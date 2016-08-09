@@ -6,6 +6,10 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 import view.IView;
 
+/**
+ * Represents a Redis-backed web search index.
+ * 
+ */
 public class WebIndex extends JedisIndex {
 
 	public WebIndex(Jedis jedis, IView view) {
@@ -126,7 +130,7 @@ public class WebIndex extends JedisIndex {
 	 * 
 	 * @return
 	 */
-	public String docTermsKey() {
+	public String corpusTermsKey() {
 		return "DocTerms";
 	}
 

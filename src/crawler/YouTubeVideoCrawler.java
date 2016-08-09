@@ -12,6 +12,11 @@ import fetcher.YouTubeData;
 import fetcher.YouTubeVideoFetcher;
 import index.IIndex;
 
+/**
+ * Web crawler for YouTube videos. 
+ * Uses YouTubeVideoFetcher to allows access to video specific data and closed captioning via an external website.
+ * 
+ */
 public class YouTubeVideoCrawler implements Crawler{
 
 	// the index where the results go
@@ -27,7 +32,7 @@ public class YouTubeVideoCrawler implements Crawler{
 	 * Constructor.
 	 * 
 	 * @param source
-	 * @param index2
+	 * @param index
 	 */
 	public YouTubeVideoCrawler(IIndex index) {
 		this.index = index;
@@ -48,17 +53,16 @@ public class YouTubeVideoCrawler implements Crawler{
 		do {
 			this.crawlPage();
 			count ++;
-		} while (count < 1);
+		} while (count < 50);
 	}
 
 	/**
 	 * Gets a URL from the queue and indexes it.
-	 * @param b 
 	 * 
 	 * @return True of indexed a new page
 	 * @throws IOException
 	 */
-	public boolean crawlPage() throws IOException {
+	private boolean crawlPage() throws IOException {
 		if (queue.isEmpty())
 			return false;
 		String crawlURL = queue.poll();

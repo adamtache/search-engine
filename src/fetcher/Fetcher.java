@@ -1,11 +1,14 @@
 package fetcher;
 
 import java.io.IOException;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+
+/**
+ * Represents a fetcher for web content.
+ * 
+ */
 
 public abstract class Fetcher {
 	

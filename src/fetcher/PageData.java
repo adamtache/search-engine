@@ -2,6 +2,10 @@ package fetcher;
 
 import org.jsoup.select.Elements;
 
+/**
+ * Represents fetched page data. Includes URL, title of page, and page content.
+ * 
+ */
 public class PageData {
 
 	private String title;

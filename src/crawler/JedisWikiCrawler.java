@@ -11,7 +11,11 @@ import fetcher.WikiFetcher;
 import index.IIndex;
 import view.IView;
 
-
+/**
+ * Web crawler for Wikipedia articles. Crawls text content of articles.
+ * Uses WikiFetcher to access information.
+ * 
+ */
 public class JedisWikiCrawler implements Crawler{
 	// keeps track of where we started
 	private final String source;
@@ -34,13 +38,13 @@ public class JedisWikiCrawler implements Crawler{
 	 * @param index2
 	 */
 	public JedisWikiCrawler(IIndex index, IView view) {
-		source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
+		source = "https://en.wikipedia.org/wiki/Quantum_mechanics";
 		this.index = index;
 		this.myView = view;
 		queue.offer(source);
 		queue.offer("https://en.wikipedia.org/wiki/Claude_Shannon");
 		queue.offer("https://en.wikipedia.org/wiki/Google");
-		queue.offer("https://en.wikipedia.org/wiki/Quantum_mechanics");
+		queue.offer("https://en.wikipedia.org/wiki/Java_(programming_language)");
 		queue.offer("https://en.wikipedia.org/wiki/Cypress_Bay_High_School");
 		queue.offer("https://en.wikipedia.org/wiki/Burger");
 		queue.offer("https://en.wikipedia.org/wiki/Ice_cream_sandwich");
@@ -72,11 +76,10 @@ public class JedisWikiCrawler implements Crawler{
 	 * @return True of indexed a new page
 	 * @throws IOException
 	 */
-	public boolean crawlPage() throws IOException {
+	private boolean crawlPage() throws IOException {
 		if (queue.isEmpty())
 			return false;
 		String crawlURL = queue.poll();
-		System.out.println("Crawling " + crawlURL);
 		PageData pageData;
 		if (index.isIndexed(crawlURL)) {
 			myView.updateStatus("Already indexed " + crawlURL);

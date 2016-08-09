@@ -6,6 +6,10 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 import view.IView;
 
+/**
+ * Represents a Redis-backed YouTube video index.
+ * 
+ */
 public class YouTubeIndex extends JedisIndex {
 
 	public YouTubeIndex(Jedis jedis, IView view) {
@@ -126,7 +130,7 @@ public class YouTubeIndex extends JedisIndex {
 	 * 
 	 * @return
 	 */
-	public String docTermsKey() {
+	public String corpusTermsKey() {
 		return "YTDocTerms";
 	}
 

@@ -2,6 +2,10 @@ package fetcher;
 
 import org.jsoup.select.Elements;
 
+/**
+ * Web data for YouTube videos. Holds caption data and YouTube meta data.
+ * 
+ */
 public class YouTubeData extends PageData {
 	
 	private Elements youtubeParagraphs;

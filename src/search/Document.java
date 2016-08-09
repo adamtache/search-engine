@@ -1,5 +1,9 @@
 package search;
 
+/**
+ * Represents a search document, with a URL, title, and snippet for displaying in search results.
+ * 
+ */
 public class Document {
 	
 	private String url;

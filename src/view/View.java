@@ -29,18 +29,19 @@ public class View implements IView {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		try {
-			myController.initialize();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		myMainScreen = new MainScreen(myController, myWidth);
+		System.out.println(myMainScreen);
 		myBooleanScreen = new BooleanScreen(myController, myWidth);
 		myYouTubeScreen = new YouTubeScreen(myController, myWidth);
 		myTabPane = new TabPane();
 		myTabPane.getTabs().addAll(myMainScreen.getTab(), myBooleanScreen.getTab(), myYouTubeScreen.getTab());
 		myScene = new Scene(myTabPane, myWidth, myHeight);
 		myScene.getStylesheets().add("resources/searchengine.css");
+		try {
+			myController.initialize();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

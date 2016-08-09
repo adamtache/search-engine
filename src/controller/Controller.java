@@ -33,12 +33,13 @@ public class Controller {
 	}
 
 	public void initialize() throws IOException{
-		// index.reset();
-//		setupYouTubeSearch();
 		setupWebSearch();
+//		setupYouTubeSearch();
+		// index.reset();
 	}
 	
 	private void setupWebSearch() throws IOException{
+//		webIndex.reset();
 //		crawl();
 		webIndex.addDocumentsToDB();
 	}

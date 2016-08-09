@@ -11,6 +11,10 @@ import parser.nodes.Node;
 import parser.nodes.ParenthesisNode;
 import parser.nodes.TermNode;
 
+/**
+ * Creates an abstract syntax tree of nodes for evaluation of boolean and grouped search queries.
+ * 
+ */
 public class TreeFactory {
 
 	private ResourceLoader myResourceLoader;

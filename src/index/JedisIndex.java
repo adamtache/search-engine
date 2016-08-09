@@ -17,6 +17,8 @@ import view.IView;
 
 /**
  * Represents a Redis-backed web search index.
+ * Has the ability to store multiple "types" of search results due to abstract key methods.
+ * i.e. "WebIndex" and "YouTubeIndex" both extend JedisIndex and offer custom key lookups to separate data.
  * 
  */
 public abstract class JedisIndex implements IIndex {
@@ -44,7 +46,7 @@ public abstract class JedisIndex implements IIndex {
 	public abstract void deleteQueryData();
 	public abstract void deleteDocData();
 	public abstract Set<String> urlSetKeys();
-	public abstract String docTermsKey();
+	public abstract String corpusTermsKey();
 	public abstract Set<String> termCounterKeys();
 
 	public Long numberIndexedPages(){
@@ -148,7 +150,7 @@ public abstract class JedisIndex implements IIndex {
 			Integer count = tc.get(term);
 			t.hset(hashname, term, count.toString()); // Keeps track of set of documents the term appears with corresponding term count (TF).
 			t.sadd(urlSetKey(term), url); // Add URL to set of documents the word appears (IDF).
-			t.sadd(docTermsKey(), term); // Add term to set of corpus terms.
+			t.sadd(corpusTermsKey(), term); // Add term to set of corpus terms.
 		}
 		List<Object> res = t.exec();
 		return res;
@@ -160,18 +162,22 @@ public abstract class JedisIndex implements IIndex {
 	}
 
 	@Override
-	public Set<String> getDocTerms(){
-		return jedis.smembers(docTermsKey());
+	public Set<String> getCorpusTerms(){
+		return jedis.smembers(corpusTermsKey());
 	}
 
 	@Override
 	public void addDocumentsToDB() {
 		deleteDocData();
 		Set<String> docURLs = getDocURLs();
-		Set<String> terms = getDocTerms();
+		Set<String> corpusTerms = getCorpusTerms();
 		for(String url : docURLs){
-			for(String term : terms){
-				double tfIdf = tfIdf(url, term);
+			for(String term : corpusTerms){
+				System.out.println(term+" " + url);
+				double tfIdf = 0;
+				if(getCount(url, term) != 0){
+					tfIdf = tfIdf(url, term);
+				}
 				String tfIdfStr = tfIdf + "";
 				Transaction t = jedis.multi();
 				t.set(getValueKey(url, term), tfIdfStr);
@@ -205,6 +211,10 @@ public abstract class JedisIndex implements IIndex {
 
 	private Double tfIdf(String url, String term){
 		double tf = getCount(url, term);
+		if(tf == 0){
+			return 0.0;
+		}
+		tf = tf + 1.0;
 		myView.updateStatus("Index determined TF to be: "+tf+".");
 		return tf * idf(term);
 	}
@@ -212,7 +222,7 @@ public abstract class JedisIndex implements IIndex {
 	private Double idf(String term){
 		Long numDocuments = numberIndexedPages();
 		Long documentFrequency = jedis.scard(urlSetKey(term));
-		return 1 + Math.log((double) numDocuments/documentFrequency);
+		return Math.log((double) numDocuments/documentFrequency);
 	}
 
 	@Override

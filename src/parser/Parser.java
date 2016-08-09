@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 import index.IIndex;
 
+/**
+ * This class represents a text parser. It parses a query into TokenizedData.
+ * 
+ */
 public class Parser {
 
 	private SpellChecker mySpellChecker;

@@ -5,7 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-
+/**
+ * Web fetcher for Wikipedia articles. Fetches content text and pulls out paragraphs.
+ * 
+ */
 public class WikiFetcher extends Fetcher{
 
 	/**

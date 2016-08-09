@@ -2,6 +2,10 @@ package parser;
 
 import org.gauner.jSpellCorrect.ToySpellingCorrector;
 
+/**
+ * SpellChecker using jSpellCorrect's ToySpellingCorrector. Learns from a training set then can correct provided words.
+ * 
+ */
 public class SpellChecker {
 	
 	private ToySpellingCorrector sc;

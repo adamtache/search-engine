@@ -37,7 +37,7 @@ public class ResultsFactory {
 
 	private static ISearchResult getVectorModelData(List<String> tokens, IIndex index){
 		tokens = getOnlyTerms(tokens);
-		Set<String> docTerms = index.getDocTerms();
+		Set<String> docTerms = index.getCorpusTerms();
 		Query query = getQuery(docTerms, tokens);
 		List<Double> queryVector = query.getQueryVector();
 		Map<Document, Double> cosSimMap = getCosSimMap(tokens, docTerms, queryVector, index);

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import fetcher.PageData;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 import search.Document;
 import search.ISearchResult;
@@ -51,6 +52,10 @@ public abstract class JedisIndex implements IIndex {
 
 	public Long numberIndexedPages(){
 		return jedis.scard(urlKey());
+	}
+
+	private Response<Long> numberIndexedPages(Transaction t){
+		return t.scard(urlKey());
 	}
 
 	public Set<String> indexedPages(){
@@ -104,6 +109,11 @@ public abstract class JedisIndex implements IIndex {
 		return new Double(count);
 	}
 
+	private Response<String> getCount(String url, String term, Transaction t) {
+		String redisKey = termCounterKey(url);
+		return t.hget(redisKey, term);
+	}
+
 	/**
 	 * Add a page to the index.
 	 * 
@@ -115,7 +125,6 @@ public abstract class JedisIndex implements IIndex {
 		String url = pageData.getURL();
 		myView.updateStatus("Indexing " + url);
 
-		// make a TermCounter and count the terms in the paragraphs
 		TermCounter tc = null;
 		try {
 			tc = new TermCounter(url);
@@ -172,20 +181,86 @@ public abstract class JedisIndex implements IIndex {
 		Set<String> docURLs = getDocURLs();
 		Set<String> corpusTerms = getCorpusTerms();
 		for(String url : docURLs){
+			Map<String, Response<String>> tfResponseMap = new HashMap<>();
+			Map<String, Response<Long>> docFreqResponseMap = new HashMap<>();
+			Long numDocuments = numberIndexedPages();
+			Transaction t = jedis.multi();
 			for(String term : corpusTerms){
-				System.out.println(term+" " + url);
-				double tfIdf = 0;
-				if(getCount(url, term) != 0){
-					tfIdf = tfIdf(url, term);
-				}
+				Response<String> tf = getCount(url, term, t);
+				tfResponseMap.put(term, tf);
+				Response<Long> docFreq = getDocFrequency(term, t);
+				docFreqResponseMap.put(term, docFreq);
+			}
+			t.exec();
+			t = jedis.multi();
+			Map<String, Long> tfMap = strResponseToLong(tfResponseMap);
+			Map<String, Long> docFreqMap = longResponseToLong(docFreqResponseMap);
+			Map<String, Double> document = this.getDocument(numDocuments, tfMap, docFreqMap);
+			for(String term : document.keySet()){
+				double tfIdf = document.get(term);
 				String tfIdfStr = tfIdf + "";
-				Transaction t = jedis.multi();
 				t.set(getValueKey(url, term), tfIdfStr);
 				t.hset(getDocKey(url), term, tfIdfStr); // Adds term and TF-IDF to URL.
 				t.rpush(getDocValuesKey(url), tfIdfStr); // Adds TF-IDF to document value list.
-				t.exec();
 			}
+			t.exec();
 		}
+	}
+
+	private Map<String, Long> strResponseToLong(Map<String, Response<String>> responseMap){
+		Map<String, Long> longMap = new HashMap<>();
+		for(String key : responseMap.keySet()){
+			String val = responseMap.get(key).get();
+			if(val != null)
+				longMap.put(key, Long.parseLong(val));
+		}
+		return longMap;
+	}
+
+	private Map<String, Long> longResponseToLong(Map<String, Response<Long>> responseMap){
+		Map<String, Long> longMap = new HashMap<>();
+		for(String key : responseMap.keySet()){
+			longMap.put(key, responseMap.get(key).get());
+		}
+		return longMap;
+	}
+
+	private Map<String, Double> getDocument(Long numDocuments, Map<String, Long> tfMap, Map<String, Long> docFreqMap){
+		Map<String, Double> document = new HashMap<>();
+		for(String term : tfMap.keySet()){
+			document.put(term, tfIdf(term, tfMap, docFreqMap, numDocuments));
+		}
+		return document;
+	}
+
+	private Double tfIdf(String term, Map<String, Long> tfMap, Map<String, Long> docFreqMap, Long numDocuments){
+		Long tf = tfMap.get(term);
+		if(tf > 0){
+			tf = tf + 1;
+		}
+		Long docFreq = docFreqMap.get(term);
+		double idf = Math.log((double) numDocuments/docFreq);
+		return tf*idf;
+	}
+
+	private Double tfIdf(String url, String term){
+		double tf = getCount(url, term);
+		if(tf == 0){
+			return 0.0;
+		}
+		tf = tf + 1.0;
+		myView.updateStatus("Index determined TF to be: "+tf+".");
+		return tf * idf(term);
+	}
+
+	private Response<Long> getDocFrequency(String term, Transaction t){
+		return t.scard(urlSetKey(term));
+	}
+
+	private Double idf(String term){
+		Long numDocuments = numberIndexedPages();
+		Long documentFrequency = jedis.scard(urlSetKey(term));
+		return Math.log((double) numDocuments/documentFrequency);
 	}
 
 	@Override
@@ -207,22 +282,6 @@ public abstract class JedisIndex implements IIndex {
 
 	private Document getDocument(String url){
 		return new Document(url, getDocTitle(url), getDocSnippet(url));
-	}
-
-	private Double tfIdf(String url, String term){
-		double tf = getCount(url, term);
-		if(tf == 0){
-			return 0.0;
-		}
-		tf = tf + 1.0;
-		myView.updateStatus("Index determined TF to be: "+tf+".");
-		return tf * idf(term);
-	}
-
-	private Double idf(String term){
-		Long numDocuments = numberIndexedPages();
-		Long documentFrequency = jedis.scard(urlSetKey(term));
-		return Math.log((double) numDocuments/documentFrequency);
 	}
 
 	@Override

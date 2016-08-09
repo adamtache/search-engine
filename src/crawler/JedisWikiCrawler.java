@@ -38,7 +38,7 @@ public class JedisWikiCrawler implements Crawler{
 	 * @param index2
 	 */
 	public JedisWikiCrawler(IIndex index, IView view) {
-		source = "https://en.wikipedia.org/wiki/Quantum_mechanics";
+		source = "https://en.wikipedia.org/wiki/Java_(programming_language)";
 		this.index = index;
 		this.myView = view;
 		queue.offer(source);
@@ -46,7 +46,7 @@ public class JedisWikiCrawler implements Crawler{
 		queue.offer("https://en.wikipedia.org/wiki/Google");
 		queue.offer("https://en.wikipedia.org/wiki/Java_(programming_language)");
 		queue.offer("https://en.wikipedia.org/wiki/Cypress_Bay_High_School");
-		queue.offer("https://en.wikipedia.org/wiki/Burger");
+		queue.offer("https://en.wikipedia.org/wiki/Hamburger");
 		queue.offer("https://en.wikipedia.org/wiki/Ice_cream_sandwich");
 		queue.offer("https://en.wikipedia.org/wiki/Rubik%27s_Cube");
 		queue.offer("https://en.wikipedia.org/wiki/Duke_University");
@@ -80,6 +80,7 @@ public class JedisWikiCrawler implements Crawler{
 		if (queue.isEmpty())
 			return false;
 		String crawlURL = queue.poll();
+		System.out.println("CRAWLING: " + crawlURL);
 		PageData pageData;
 		if (index.isIndexed(crawlURL)) {
 			myView.updateStatus("Already indexed " + crawlURL);

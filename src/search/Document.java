@@ -32,4 +32,14 @@ public class Document {
 		return title+" "+url;
 	}
 	
+	@Override
+	public boolean equals(Object o){
+		return ((Document) o).getURL().toLowerCase().equals(this.getURL().toLowerCase());
+	}
+	
+	@Override
+	public int hashCode(){
+		return 2;
+	}
+	
 }

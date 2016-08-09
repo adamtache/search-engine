@@ -1,5 +1,6 @@
 package view;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
@@ -25,7 +26,11 @@ public class StatusBar{
 	}
 	
 	public void updateStatus(String status){
-		myStatusOutput.appendText(status + "\n");
+		Platform.runLater(new Runnable() {
+		    public void run() {
+		    	myStatusOutput.appendText(status + "\n");
+		    }
+		});
 	}
 	
 	public Node getNode(){

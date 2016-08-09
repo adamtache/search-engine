@@ -380,7 +380,12 @@ public abstract class JedisIndex implements IIndex {
 		Set<String> URLs = jedis.hkeys(queryKey(query));
 		for(String url : URLs){
 			String value = jedis.hget(queryKey(query), url);
-			queryMap.put(getDocument(url), Double.parseDouble(value));
+			Document doc = getDocument(url);
+			if(value != null)
+				queryMap.put(doc, Double.parseDouble(value));
+			else{
+				queryMap.put(doc, 0.0);
+			}
 		}
 		return new SearchResult(queryMap);
 	}

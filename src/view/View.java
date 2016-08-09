@@ -3,14 +3,19 @@ package view;
 import java.io.IOException;
 import controller.Controller;
 import javafx.scene.Scene;
+import javafx.scene.control.TabPane;
 import search.ISearchResult;
 
 public class View implements IView {
 	
 	private Controller myController;
-	private MainScreen myMainScreen;
+	private Screen myMainScreen;
+	private Screen myBooleanScreen;
+	private Screen myYouTubeScreen;
 	private int myWidth;
 	private int myHeight;
+	private Scene myScene;
+	private TabPane myTabPane;
 	
 	public View(int windowWidth, int windowHeight) {
 		this.myWidth = windowWidth;
@@ -24,12 +29,18 @@ public class View implements IView {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		myMainScreen = new MainScreen(myController, myWidth, myHeight);
 		try {
 			myController.initialize();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		myMainScreen = new MainScreen(myController, myWidth);
+		myBooleanScreen = new BooleanScreen(myController, myWidth);
+		myYouTubeScreen = new YouTubeScreen(myController, myWidth);
+		myTabPane = new TabPane();
+		myTabPane.getTabs().addAll(myMainScreen.getTab(), myBooleanScreen.getTab(), myYouTubeScreen.getTab());
+		myScene = new Scene(myTabPane, myWidth, myHeight);
+		myScene.getStylesheets().add("resources/searchengine.css");
 	}
 	
 	@Override
@@ -49,7 +60,7 @@ public class View implements IView {
 	}
 	
 	public Scene getScene(){
-		return myMainScreen.getScene();
+		return myScene;
 	}
 	
 	public void updateStatus(String status){

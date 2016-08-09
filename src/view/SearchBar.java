@@ -10,24 +10,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import search.ISearchResult;
 
-public class SearchBar {
+public abstract class SearchBar {
 	
 	private static final String SEARCH_PROMPT = "Enter search query here.";
 	private static final int HBOX_SPACING = 10;
 	private static final double SEARCH_BAR_WIDTH = 500;
 	private static final int HBOX_PADDING = 20;
 	private TextField textField;
-	private Button searchButton;
-	private Button ytSearchButton;
+	public Button searchButton;
 	private Button feelingLuckyButton;
-	private Controller myController;
-	private HBox myRoot;
-	private MainScreen myMainScreen;
-	private ProgressBar bar;
+	protected Controller myController;
+	protected HBox myRoot;
+	protected Screen myMainScreen;
+	protected ProgressBar bar;
 	
-	public SearchBar(Controller controller, MainScreen mainScreen){
+	public SearchBar(Controller controller, Screen mainScreen){
 		this.myController = controller;
 		this.myMainScreen = mainScreen;
 		initialize();
@@ -40,9 +38,8 @@ public class SearchBar {
 		this.textField.setPrefWidth(SEARCH_BAR_WIDTH);
 		this.bar = new ProgressBar();
 		setupSearchButton(searchButton);
-		setupYTSearchButton(ytSearchButton);
 		setupFeelingLuckyButton(feelingLuckyButton);
-		myRoot.getChildren().addAll(textField, searchButton, feelingLuckyButton, ytSearchButton);
+		myRoot.getChildren().addAll(textField, searchButton, feelingLuckyButton);
 	}
 	
 	private HBox makeHbox() {
@@ -52,47 +49,19 @@ public class SearchBar {
 		return hbox;
 	}
 	
-	private void setupSearchButton(Button searchButton) {
-		this.searchButton = new Button("Search");
-		this.searchButton.setOnAction(event -> {
-			myMainScreen.updateStatus("Search started.");
-			runDisplay(false, false);
-		});
-	}
+	abstract void setupSearchButton(Button searchButton);
 	
-	private void setupYTSearchButton(Button searchButton) {
-		this.ytSearchButton = new Button("Search YouTube");
-		this.ytSearchButton.setOnAction(event -> {
-			myMainScreen.updateStatus("YouTube Search started.");
-			runDisplay(false, true);
-		});
-	}
-	
-	private void runDisplay(boolean isLucky, boolean youtube){
-		Task<Void> task = createTask(new Callable<Void>() {
-			public Void call(){
-				ISearchResult result = youtube ? myController.getYTResults(getSearchQuery()) : myController.getResults(getSearchQuery());
-				if(isLucky) myController.goToLucky(result);
-				else myController.display(result);
-				return null;
-			}
-		}); 
-		new Thread(task).start();
-		task.setOnSucceeded(event -> {
-			myMainScreen.updateStatus("Finished displaying. Done.");
-			myRoot.getChildren().remove(bar);
-		});
-	}
+	abstract void runDisplay(boolean isLucky);
 
 	private void setupFeelingLuckyButton(Button feelingLuckyButton) {
 		this.feelingLuckyButton = new Button("Feeling lucky?");
 		this.feelingLuckyButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Lucky search started.");
-			runDisplay(true, false);
+			runDisplay(true);
 		});
 	}
 	
-	private Task<Void> createTask(Callable<Void> myFunc){
+	protected Task<Void> createTask(Callable<Void> myFunc){
 		Task<Void> task = new Task<Void> () {
 			@Override
 			public Void call(){

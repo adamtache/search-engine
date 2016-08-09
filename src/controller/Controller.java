@@ -35,6 +35,7 @@ public class Controller {
 	public void initialize() throws IOException{
 		setupWebSearch();
 //		setupYouTubeSearch();
+		// index.reset();
 	}
 	
 	private void setupWebSearch() throws IOException{

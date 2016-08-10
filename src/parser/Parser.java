@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import index.IIndex;
-
 /**
  * This class represents a text parser. It parses a query into TokenizedData.
  * 
@@ -14,7 +12,6 @@ import index.IIndex;
 public class Parser {
 
 	private SpellChecker mySpellChecker;
-	private IIndex myIndex;
 
 	public Parser(){
 		this.mySpellChecker = new SpellChecker();
@@ -23,6 +20,10 @@ public class Parser {
 	public TokenizedData tokenize(String query) {
 		List<String> tokens = Arrays.stream(query.split("\\s+")).map(String::toLowerCase)
 				.collect(Collectors.toCollection(ArrayList::new));
+		return tokenize(tokens);
+	}
+	
+	public TokenizedData tokenize(List<String> tokens){
 		tokens = this.removeRepeatingBooleanOperators(tokens);
 		tokens = this.separateParenthesis(tokens);
 		List<String> removedPunctuation = new ArrayList<>();
@@ -35,7 +36,7 @@ public class Parser {
 			}
 		}
 		List<String> spellCorrected = this.correctSpelling(tokens);
-		return new TokenizedData(tokens, spellCorrected, myIndex);
+		return new TokenizedData(tokens, spellCorrected);
 	}
 
 	private List<String> correctSpelling(List<String> tokens){

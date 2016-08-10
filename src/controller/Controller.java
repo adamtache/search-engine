@@ -41,7 +41,6 @@ public class Controller {
 		webIndex.reset();
 		crawl();
 		webIndex.addDocumentsToDB();
-		System.out.println("HERE");
 	}
 	
 	private void setupYouTubeSearch() throws IOException{
@@ -108,6 +107,22 @@ public class Controller {
 
 	public void displaySpellCorrected() {
 		display(getResults(getSpellCorrected()));
+	}
+
+	public void displayYT(ISearchResult result) {
+		myView.updateStatus("Controller initializing display of YT data.");
+		myView.displayYT(result);
+	}
+
+	public ISearchResult getBooleanResults(String query) {
+		myView.updateStatus("Controller obtaining search results.");
+		if(webIndex.hasQueryData(query)){
+			return webIndex.getQueryResult(query);
+		}
+		ISearchResult result = ResultsFactory.getBooleanResult(myParser.tokenize(query), webIndex);
+		this.webIndex.storeQuery(query, result);
+		this.myLastResult = result;
+		return result;
 	}
 
 }

@@ -50,6 +50,7 @@ public class SearchResults {
 	}
 
 	public void display(ISearchResult data) {
+		mySearchResults.getChildren().clear();
 		myResultPane.getChildren().clear();
 		myResultPane.getChildren().add(myRoot);
 		if(data.checkCorrectedSpelling()){

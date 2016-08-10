@@ -3,8 +3,6 @@ package view;
 import java.io.IOException;
 import controller.Controller;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import search.ISearchResult;
@@ -13,7 +11,6 @@ public class View implements IView {
 	
 	private Controller myController;
 	private Screen myMainScreen;
-	private Screen myBooleanScreen;
 	private Screen myYouTubeScreen;
 	private int myWidth;
 	private int myHeight;
@@ -33,12 +30,10 @@ public class View implements IView {
 			e.printStackTrace();
 		}
 		myMainScreen = new MainScreen(myController, myWidth);
-		System.out.println(myMainScreen);
-		myBooleanScreen = new BooleanScreen(myController, myWidth);
 		myYouTubeScreen = new YouTubeScreen(myController, myWidth);
 		myTabPane = new TabPane();
 		myTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-		myTabPane.getTabs().addAll(myMainScreen.getTab(), myBooleanScreen.getTab(), myYouTubeScreen.getTab());
+		myTabPane.getTabs().addAll(myMainScreen.getTab(), myYouTubeScreen.getTab());
 		myScene = new Scene(myTabPane, myWidth, myHeight);
 		myScene.getStylesheets().add("resources/searchengine.css");
 		try {
@@ -52,6 +47,12 @@ public class View implements IView {
 	public void display(ISearchResult result) {
 		myMainScreen.updateStatus("View telling MainScreen to display results.");
 		myMainScreen.display(result);
+	}
+	
+	@Override
+	public void displayYT(ISearchResult result){
+		myYouTubeScreen.updateStatus("View telling YouTubeScreen to display YT results.");
+		myYouTubeScreen.display(result);
 	}
 
 	@Override

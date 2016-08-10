@@ -17,6 +17,7 @@ public abstract class SearchBar {
 	private static final int HBOX_PADDING = 20;
 	private TextField textField;
 	public Button searchButton;
+	public Button booleanButton;
 	private Button feelingLuckyButton;
 	protected Controller myController;
 	protected HBox myRoot;
@@ -35,9 +36,9 @@ public abstract class SearchBar {
 		this.textField.setPromptText(SEARCH_PROMPT);
 		this.textField.setPrefWidth(SEARCH_BAR_WIDTH);
 		this.bar = new ProgressBar();
-		setupSearchButton(searchButton);
+		setupSearchButton(searchButton, booleanButton);
 		setupFeelingLuckyButton(feelingLuckyButton);
-		myRoot.getChildren().addAll(textField, searchButton, feelingLuckyButton);
+		myRoot.getChildren().addAll(textField, searchButton, booleanButton, feelingLuckyButton);
 	}
 	
 	private HBox makeHbox() {
@@ -47,15 +48,15 @@ public abstract class SearchBar {
 		return hbox;
 	}
 	
-	abstract void setupSearchButton(Button searchButton);
+	abstract void setupSearchButton(Button searchButton, Button booleanButton);
 	
-	abstract void runDisplay(boolean isLucky);
+	abstract void runDisplay(boolean mainSearch, boolean isLucky);
 
 	private void setupFeelingLuckyButton(Button feelingLuckyButton) {
 		this.feelingLuckyButton = new Button("Feeling lucky?");
 		this.feelingLuckyButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Lucky search started.");
-			runDisplay(true);
+			runDisplay(true, true);
 		});
 	}
 	

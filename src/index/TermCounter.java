@@ -78,7 +78,6 @@ public class TermCounter {
 		// we already have a tree iterator, let's use it.
 		for (Node node: new NodeIterable(root)) {
 			if (node instanceof TextNode) {
-				System.out.println("NODE: " + ((TextNode) node).text());
 				processText(((TextNode) node).text());
 			}
 		}

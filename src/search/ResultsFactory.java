@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import index.IIndex;
 import parser.Parser;
 import parser.TokenizedData;
@@ -14,29 +13,31 @@ import parser.TreeFactory;
 import parser.nodes.Node;
 
 public class ResultsFactory {
-
-	public static ISearchResult getSearchResult(TokenizedData tokenizedData, IIndex index){
+	
+	public static ISearchResult getBooleanResult(TokenizedData tokenizedData, IIndex index){
 		List<String> tokens = tokenizedData.getTokens();
-		if(isVectorSpaceModel(tokens)){
-			return getVectorModelData(tokens, index);
-		}
-		// Boolean model
 		List<Node> roots = new TreeFactory(index).createRoot(tokens);
 		return getData(roots, tokenizedData, index);
 	}
 
+	public static ISearchResult getSearchResult(TokenizedData tokenizedData, IIndex index){
+		List<String> tokens = tokenizedData.getTokens();
+		return getVectorModelData(tokens, index);
+	}
+
 	public static ISearchResult getSpellCorrectedResult(TokenizedData tokenizedData, IIndex index){
 		List<String> correctedTokens = tokenizedData.getSpellCorrected();
-		if(isVectorSpaceModel(correctedTokens)){
-			return getVectorModelData(correctedTokens, index);
-		}
-		// Boolean model
+		return getVectorModelData(correctedTokens, index);	
+	}
+	
+	public static ISearchResult getSpellCorrectedBoolean(TokenizedData tokenizedData, IIndex index){
+		List<String> correctedTokens = tokenizedData.getSpellCorrected();
 		List<Node> correctedRoots = new TreeFactory(index).createRoot(correctedTokens);
 		return getData(correctedRoots, tokenizedData, index);
 	}
 
 	private static ISearchResult getVectorModelData(List<String> tokens, IIndex index){
-		tokens = getOnlyTerms(tokens);
+		tokens = getTokens(tokens);
 		Set<String> docTerms = index.getCorpusTerms();
 		Query query = getQuery(docTerms, tokens);
 		List<Double> queryVector = query.getQueryVector();
@@ -44,14 +45,8 @@ public class ResultsFactory {
 		return new SearchResult(cosSimMap);
 	}
 
-	private static List<String> getOnlyTerms(List<String> tokens){
-		List<String> terms = new ArrayList<>();
-		for(int x=0; x<tokens.size(); x++){
-			String token = tokens.get(x);
-			if(Parser.isWord(token))
-				terms.add(token);
-		}
-		return terms;
+	private static List<String> getTokens(List<String> tokens){
+		return new Parser().tokenize(tokens).getTokens();
 	}
 
 	private static Map<Document, Double> getCosSimMap(List<String> tokens, Set<String> docTerms, List<Double> queryVector, IIndex index){
@@ -120,29 +115,6 @@ public class ResultsFactory {
 		return new Query(queryMap);
 	}
 
-	private static boolean isVectorSpaceModel(List<String> tokens){
-		if(tokens.size() < 2){
-			return false;
-		}
-		for(String token : tokens){
-			if(isBooleanOperator(token)){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private static boolean isBooleanOperator(String token){
-		token = token.toLowerCase();
-		String[] booleanOperators = {"and", "or", "not", "minus", "-", "&"};
-		for(String bool : booleanOperators){
-			if(bool.equals(token.toLowerCase())){
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private static ISearchResult getData(List<Node> roots, TokenizedData tokenizedData, IIndex index){
 		ISearchResult data = evaluateRoots(roots, index);
 		if(data != null)
@@ -151,6 +123,7 @@ public class ResultsFactory {
 	}
 
 	private static ISearchResult evaluateRoots(List<Node> roots, IIndex index){
+		System.out.println("4");
 		return new TreeEvaluator().evaluateRoots(roots, index);
 	}
 

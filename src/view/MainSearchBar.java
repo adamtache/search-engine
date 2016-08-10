@@ -12,23 +12,31 @@ public class MainSearchBar extends SearchBar{
 	}
 
 	@Override
-	void setupSearchButton(Button searchButton) {
+	void setupSearchButton(Button searchButton, Button booleanButton) {
 		this.searchButton = new Button("Search");
+		this.booleanButton = new Button("Boolean Search");
 		this.searchButton.setOnAction(event -> {
 			myMainScreen.updateStatus("Search started.");
-			runDisplay(false);
+			runDisplay(false, false);
+		});
+		this.booleanButton.setOnAction(event -> {
+			myMainScreen.updateStatus("Search started.");
+			runDisplay(true, false);
 		});
 	}
-	
+
 	@Override
-	protected void runDisplay(boolean isLucky){
-		ISearchResult result = myController.getResults(getSearchQuery());
+	protected void runDisplay(boolean mainSearch, boolean isLucky){
+		ISearchResult result = null;
+		if(mainSearch){
+			result = myController.getResults(getSearchQuery());
+		}
+		else{
+			result = myController.getBooleanResults(getSearchQuery());
+		}
 		if(isLucky) myController.goToLucky(result);
 		else myController.display(result);
 		Platform.runLater( () -> {
-//			ISearchResult result = myController.getResults(getSearchQuery());
-//			if(isLucky) myController.goToLucky(result);
-//			else myController.display(result);
 			myMainScreen.updateStatus("Finished displaying. Done.");
 			myRoot.getChildren().remove(bar);
 		});

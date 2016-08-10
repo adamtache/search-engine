@@ -177,6 +177,7 @@ public abstract class JedisIndex implements IIndex {
 		Set<String> docURLs = getDocURLs();
 		Set<String> corpusTerms = getCorpusTerms();
 		for(String url : docURLs){
+			System.out.println("URL: " + url);
 			Map<String, Response<String>> tfResponseMap = new HashMap<>();
 			Map<String, Response<Long>> docFreqResponseMap = new HashMap<>();
 			Long numDocuments = numberIndexedPages();
@@ -381,7 +382,7 @@ public abstract class JedisIndex implements IIndex {
 		for(String url : URLs){
 			String value = jedis.hget(queryKey(query), url);
 			Document doc = getDocument(url);
-			if(value != null)
+			if(value != null && !value.equals("null"))
 				queryMap.put(doc, Double.parseDouble(value));
 			else{
 				queryMap.put(doc, 0.0);

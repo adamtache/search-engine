@@ -14,5 +14,7 @@ public interface IView {
 	public abstract void display(ISearchResult result);
 
 	public abstract void display(String url);
+
+	public abstract void displayYT(ISearchResult result);
 	
 }
